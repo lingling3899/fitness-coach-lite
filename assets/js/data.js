@@ -58,6 +58,10 @@ window.FITNESS_DATA = {
       name: "史密斯深蹲",
       category: "gym",
       muscles: ["legs"],
+      formCue: "knee",
+      wrongCue: "膝內扣、腰過度塌",
+      rightCue: "膝對腳尖、腰中立",
+      muscleBadge: "腿",
       emoji: "🏋️",
       steps: [
         "槓位置於上斜方，雙腳與肩同寬或稍寬，腳尖微外開。",
@@ -74,6 +78,10 @@ window.FITNESS_DATA = {
       name: "史密斯推胸",
       category: "gym",
       muscles: ["chest", "arms"],
+      formCue: "spine",
+      wrongCue: "聳肩、過度拱腰",
+      rightCue: "肩胛後夾、腰輕貼",
+      muscleBadge: "胸",
       emoji: "🛏️",
       steps: [
         "長凳置於槓下，眼約對槓；雙手略寬於肩握住。",
@@ -90,6 +98,10 @@ window.FITNESS_DATA = {
       name: "腿舉機",
       category: "gym",
       muscles: ["legs"],
+      formCue: "knee",
+      wrongCue: "臀離墊、膝內扣",
+      rightCue: "腰貼墊、膝跟腳尖",
+      muscleBadge: "腿",
       emoji: "🦵",
       steps: [
         "坐穩，背貼靠墊；雙腳置踏板上約肩寬。",
@@ -106,6 +118,10 @@ window.FITNESS_DATA = {
       name: "坐姿划船",
       category: "gym",
       muscles: ["back", "arms"],
+      formCue: "spine",
+      wrongCue: "用腰前後甩",
+      rightCue: "軀幹穩、夾肩胛",
+      muscleBadge: "背",
       emoji: "🚣",
       steps: [
         "坐穩，腳踏固定，微屈膝；雙手握把手。",
@@ -122,6 +138,10 @@ window.FITNESS_DATA = {
       name: "高位下拉",
       category: "gym",
       muscles: ["back", "arms"],
+      formCue: "spine",
+      wrongCue: "過度後仰借力",
+      rightCue: "微後傾、拉至上胸",
+      muscleBadge: "背",
       emoji: "⬇️",
       steps: [
         "坐穩扣好大腿墊，雙手略寬於肩握槓。",
@@ -138,6 +158,10 @@ window.FITNESS_DATA = {
       name: "蝴蝶夾胸機",
       category: "gym",
       muscles: ["chest"],
+      formCue: "spine",
+      wrongCue: "肩向前塌、甩合",
+      rightCue: "背貼墊、控制開合",
+      muscleBadge: "胸",
       emoji: "🦋",
       steps: [
         "座椅調至手肘約與肩同高，背貼靠墊。",
@@ -154,6 +178,10 @@ window.FITNESS_DATA = {
       name: "繩索面拉",
       category: "gym",
       muscles: ["shoulders", "back"],
+      formCue: "head",
+      wrongCue: "變划船、聳肩",
+      rightCue: "肘高、外旋至頭側",
+      muscleBadge: "肩",
       emoji: "🎯",
       steps: [
         "繩索調至約頭臉高度，握繩兩端。",
@@ -170,6 +198,10 @@ window.FITNESS_DATA = {
       name: "肩推機",
       category: "gym",
       muscles: ["shoulders", "arms"],
+      formCue: "spine",
+      wrongCue: "過度拱腰、頭前伸",
+      rightCue: "背貼墊、頸中立",
+      muscleBadge: "肩",
       emoji: "⬆️",
       steps: [
         "座椅調至握把約與肩同高，背貼靠墊。",
@@ -186,6 +218,11 @@ window.FITNESS_DATA = {
       name: "繩索三頭下壓",
       category: "gym",
       muscles: ["arms"],
+      highlightArms: "triceps",
+      formCue: "elbow",
+      wrongCue: "肘甩開離開身側",
+      rightCue: "肘固定貼身側",
+      muscleBadge: "三頭",
       emoji: "📉",
       steps: [
         "高位滑輪接直槓或繩，肘貼身側。",
@@ -204,6 +241,10 @@ window.FITNESS_DATA = {
       name: "徒手深蹲",
       category: "home",
       muscles: ["legs", "core"],
+      formCue: "knee",
+      wrongCue: "膝內扣、彎腰",
+      rightCue: "膝對腳尖、胸挺",
+      muscleBadge: "腿",
       emoji: "🪴",
       steps: [
         "雙腳約肩寬，腳尖微外開，目視前方。",
@@ -220,6 +261,10 @@ window.FITNESS_DATA = {
       name: "伏地挺身",
       category: "home",
       muscles: ["chest", "arms", "core"],
+      formCue: "spine",
+      wrongCue: "塌腰或撅臀",
+      rightCue: "頭到腳跟成線",
+      muscleBadge: "胸",
       emoji: "🤸",
       steps: [
         "平板支撑姿勢，手略寬於肩，身體成一直線。",
@@ -236,6 +281,10 @@ window.FITNESS_DATA = {
       name: "平板撑",
       category: "home",
       muscles: ["core"],
+      formCue: "spine",
+      wrongCue: "塌腰致下背受力",
+      rightCue: "收腹夾臀成線",
+      muscleBadge: "核心",
       emoji: "🧱",
       steps: [
         "肘或手撑地，身體從頭到腳跟成一直線。",
@@ -252,6 +301,10 @@ window.FITNESS_DATA = {
       name: "啞鈴划船",
       category: "home",
       muscles: ["back", "arms"],
+      formCue: "spine",
+      wrongCue: "轉身甩腰、頸仰",
+      rightCue: "背平、頸中立拉髖",
+      muscleBadge: "背",
       emoji: "🏋️",
       steps: [
         "單膝單手撑凳（或微屈髖站姿單邊），另手持啞鈴。",
@@ -268,6 +321,10 @@ window.FITNESS_DATA = {
       name: "啞鈴肩推",
       category: "home",
       muscles: ["shoulders", "arms"],
+      formCue: "spine",
+      wrongCue: "過度拱腰、頭前伸",
+      rightCue: "核心收、頸中立",
+      muscleBadge: "肩",
       emoji: "🏋️",
       steps: [
         "坐姿或站姿，啞鈴舉至肩側，掌心向前或微內旋。",
@@ -284,6 +341,10 @@ window.FITNESS_DATA = {
       name: "臀橋",
       category: "home",
       muscles: ["legs", "core"],
+      formCue: "spine",
+      wrongCue: "用腰拱代替夾臀",
+      rightCue: "腳跟蹬、頂端夾臀",
+      muscleBadge: "臀腿",
       emoji: "🌉",
       steps: [
         "仰臥，膝屈，腳掌着地約與髖同寬。",
@@ -300,6 +361,10 @@ window.FITNESS_DATA = {
       name: "弓步蹲",
       category: "home",
       muscles: ["legs"],
+      formCue: "knee",
+      wrongCue: "前膝內扣或失控",
+      rightCue: "前膝對腳尖、軀幹直",
+      muscleBadge: "腿",
       emoji: "🚶",
       steps: [
         "站直，向前一大步，雙腳前後分開。",
@@ -316,6 +381,11 @@ window.FITNESS_DATA = {
       name: "啞鈴彎舉",
       category: "home",
       muscles: ["arms"],
+      highlightArms: "biceps",
+      formCue: "elbow",
+      wrongCue: "借腰晃、肘前移",
+      rightCue: "肘貼身只彎前臂",
+      muscleBadge: "二頭",
       emoji: "💪",
       steps: [
         "站直或坐穩，雙手持啞鈴垂於身側。",
@@ -332,6 +402,10 @@ window.FITNESS_DATA = {
       name: "啞鈴胸推（地板／長凳）",
       category: "home",
       muscles: ["chest", "arms"],
+      formCue: "spine",
+      wrongCue: "過度拱腰、路徑不穩",
+      rightCue: "肩胛後夾、控幅度",
+      muscleBadge: "胸",
       emoji: "🛏️",
       steps: [
         "仰臥於地板或長凳，啞鈴舉於胸上方，掌心向前。",
@@ -343,5 +417,33 @@ window.FITNESS_DATA = {
       prescription: "新手 3 組 × 8–12 次",
       safety: "地板版幅度較安全適合家用；起立時小心將啞鈴放低再起身。"
     }
-  ]
+  ],
+
+  challenge: {
+    title: "21 日入門挑戰",
+    subtitle: "每日一動作 · 示意圖解 · 可自備短片連結",
+    days: [
+      { day: 1, exerciseId: "pushup" },
+      { day: 2, exerciseId: "db-curl" },
+      { day: 3, exerciseId: "db-shoulder-press" },
+      { day: 4, exerciseId: "bw-squat" },
+      { day: 5, exerciseId: "db-row" },
+      { day: 6, exerciseId: "triceps-pushdown" },
+      { day: 7, exerciseId: "plank" },
+      { day: 8, exerciseId: "dumbbell-press-home" },
+      { day: 9, exerciseId: "lat-pulldown" },
+      { day: 10, exerciseId: "face-pull" },
+      { day: 11, exerciseId: "lunge" },
+      { day: 12, exerciseId: "glute-bridge" },
+      { day: 13, exerciseId: "pec-deck" },
+      { day: 14, exerciseId: "shoulder-press-machine" },
+      { day: 15, exerciseId: "smith-squat" },
+      { day: 16, exerciseId: "leg-press" },
+      { day: 17, exerciseId: "seated-row" },
+      { day: 18, exerciseId: "smith-bench" },
+      { day: 19, exerciseId: "db-curl" },
+      { day: 20, exerciseId: "plank" },
+      { day: 21, exerciseId: "bw-squat" }
+    ]
+  }
 };

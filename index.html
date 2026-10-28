@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="description" content="健身教練 Lite：按部位教學、健身房／家用動作示範、本機訓練記錄。示意非醫療，請咨詢專業教練。" />
+  <meta name="description" content="健身教練 Lite：按部位教學、健身房／家用動作、21 日短片式圖解挑戰、本機訓練記錄。示意非醫療，請咨詢專業教練。" />
   <meta name="theme-color" content="#0f1419" />
-  <title>健身教練 Lite · 部位教學／儀器動作／訓練記錄</title>
-  <link rel="stylesheet" href="assets/css/app.css?v=20261028a" />
+  <title>健身教練 Lite · 部位／動作／短片教學／訓練記錄</title>
+  <link rel="stylesheet" href="assets/css/app.css?v=20261028b" />
 </head>
 <body>
   <header class="topbar">
@@ -15,12 +15,13 @@
         <div class="brand-mark" aria-hidden="true">💪</div>
         <div class="brand-text">
           <h1>健身教練 Lite</h1>
-          <p>部位教學　｜　儀器／動作　｜　訓練記錄　｜　說明</p>
+          <p>部位　｜　儀器／動作　｜　短片教學　｜　記錄　｜　說明</p>
         </div>
       </div>
       <nav class="nav-tabs" aria-label="主要分頁">
         <button type="button" class="active" data-view="muscles">部位教學</button>
         <button type="button" data-view="moves">儀器／動作</button>
+        <button type="button" data-view="shorts">短片教學</button>
         <button type="button" data-view="log">訓練記錄</button>
         <button type="button" data-view="about">說明</button>
       </nav>
@@ -32,7 +33,7 @@
     <section id="view-muscles" class="view active" aria-labelledby="muscles-title">
       <div class="panel">
         <h2 id="muscles-title">教練按部位帶路</h2>
-        <p class="lead">揀胸／背／肩／手臂／腿／核心，睇短提示同推薦動作。再入「儀器／動作」睇步驟同記訓練。</p>
+        <p class="lead">揀胸／背／肩／手臂／腿／核心，睇短提示同推薦動作。再入「儀器／動作」或「短片教學」睇步驟同圖解。</p>
       </div>
       <div id="muscleGrid" class="grid" aria-live="polite"></div>
     </section>
@@ -59,6 +60,20 @@
         <p class="count" id="moveCount"></p>
       </div>
       <div id="moveGrid" class="grid" aria-live="polite"></div>
+    </section>
+
+    <!-- 短片教學／21 日挑戰 -->
+    <section id="view-shorts" class="view" aria-labelledby="shorts-title">
+      <div class="panel challenge-hero">
+        <div class="challenge-badge-row">
+          <span class="pill-gold">21-DAY</span>
+          <span class="pill gym">示意圖解</span>
+          <span class="pill home">可自備短片</span>
+        </div>
+        <h2 id="shorts-title">短片教學 · 21 日入門挑戰</h2>
+        <p class="lead">深色金邊卡網格（DAY 徽章＋肌群高亮示意）。撳卡睇錯誤／正確對比、步驟同短片連結位。圖解為原創簡化 SVG，並非抄襲他牌；真片請自備 YouTube 連結。</p>
+      </div>
+      <div id="dayGrid" class="day-grid" aria-live="polite"></div>
     </section>
 
     <!-- 訓練記錄 -->
@@ -88,21 +103,22 @@
     <section id="view-about" class="view" aria-labelledby="about-title">
       <div class="panel">
         <h2 id="about-title">關於健身教練 Lite</h2>
-        <p class="lead">靜態精簡版：部位教練提示、健身房／家用動作教學、本機訓練日誌。適合快速查同記，唔取代真人教練。</p>
+        <p class="lead">靜態精簡版：部位教練提示、健身房／家用動作教學、21 日短片式圖解挑戰、本機訓練日誌。適合快速查同記，唔取代真人教練。</p>
         <p id="aboutStats" class="count"></p>
         <ul class="about-list">
           <li><strong>部位教學</strong>：胸、背、肩、手臂、腿、核心 — 短提示＋推薦動作。</li>
           <li><strong>儀器／動作</strong>：健身房常見器械同家用徒手／啞鈴各精簡數款；含步驟、常見錯誤、新手組數參考。</li>
+          <li><strong>短片教學</strong>：21 日挑戰卡網格、錯誤／正確姿勢示意、肌群高亮 SVG；可選貼上自備 YouTube 連結（本機儲存）。短片版面為示意圖解，非抄襲他牌品牌或影片；真片要自備連結。</li>
           <li><strong>訓練記錄</strong>：日期、動作、組數×次數、可選重量（kg）、備註；可篩選／刪除。</li>
-          <li><strong>私隱</strong>：資料鍵 <code>fitnessCoachLite.logs.v1</code>，只在本機。</li>
+          <li><strong>私隱</strong>：資料鍵 <code>fitnessCoachLite.logs.v1</code>、<code>fitnessCoachLite.videos.v1</code>，只在本機。</li>
         </ul>
         <div class="disclaimer">
-          <strong>重要聲明：</strong>本站內容僅供一般健身教學示意，<strong>並非醫療建議</strong>，亦唔取代合格教練或物理治療指導。傷病、懷孕、慢性疾病或痛楚期間，請先咨詢醫生／專業教練。訓練請量力而為，注意熱身同安全。
+          <strong>重要聲明：</strong>本站內容僅供一般健身教學示意，<strong>並非醫療建議</strong>，亦唔取代合格教練或物理治療指導。傷病、懷孕、慢性疾病或痛楚期間，請先咨詢醫生／專業教練。訓練請量力而為，注意熱身同安全。解剖圖為簡化示意，唔等於真實解剖或醫學診斷。
         </div>
       </div>
       <div class="panel">
         <h3>版本</h3>
-        <p class="muted tiny">fitness-coach-lite · ?v=20261028a · GitHub Pages</p>
+        <p class="muted tiny">fitness-coach-lite · ?v=20261028b · GitHub Pages</p>
       </div>
     </section>
   </main>
@@ -113,7 +129,7 @@
   <div id="detailBackdrop" class="detail-backdrop" aria-hidden="true"></div>
   <div id="detailPanel" class="detail-panel" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="detailTitle">
     <div class="detail-toolbar">
-      <span>動作教學</span>
+      <span id="detailToolbarLabel">動作教學</span>
       <button type="button" class="icon-btn" data-close-detail aria-label="關閉">✕</button>
     </div>
     <div class="detail-scroll" id="detailBody"></div>
@@ -158,7 +174,8 @@
     </div>
   </div>
 
-  <script src="assets/js/data.js?v=20261028a"></script>
-  <script src="assets/js/app.js?v=20261028a"></script>
+  <script src="assets/js/data.js?v=20261028b"></script>
+  <script src="assets/js/anatomy.js?v=20261028b"></script>
+  <script src="assets/js/app.js?v=20261028b"></script>
 </body>
 </html>

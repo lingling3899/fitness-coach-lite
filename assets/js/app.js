@@ -1,9 +1,11 @@
-/* 健身教練 Lite — UI／記錄 */
+/* 健身教練 Lite — UI／記錄／短片教學 */
 (function () {
   "use strict";
 
   const STORAGE_KEY = "fitnessCoachLite.logs.v1";
+  const VIDEO_KEY = "fitnessCoachLite.videos.v1";
   const data = window.FITNESS_DATA;
+  const anatomy = window.FITNESS_ANATOMY;
   if (!data) {
     console.error("FITNESS_DATA missing");
     return;
@@ -18,6 +20,7 @@
     categoryFilter: "",
     search: "",
     detailId: null,
+    detailFromShorts: false,
     logFilterMuscle: "",
     logFilterDate: ""
   };
@@ -50,6 +53,44 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
   }
 
+  function loadVideos() {
+    try {
+      const raw = localStorage.getItem(VIDEO_KEY);
+      if (!raw) return {};
+      const obj = JSON.parse(raw);
+      return obj && typeof obj === "object" ? obj : {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function saveVideos(map) {
+    localStorage.setItem(VIDEO_KEY, JSON.stringify(map));
+  }
+
+  function getVideoUrl(exerciseId) {
+    const map = loadVideos();
+    return (map[exerciseId] || "").trim();
+  }
+
+  function setVideoUrl(exerciseId, url) {
+    const map = loadVideos();
+    const cleaned = (url || "").trim();
+    if (!cleaned) delete map[exerciseId];
+    else map[exerciseId] = cleaned;
+    saveVideos(map);
+  }
+
+  function isLikelyVideoUrl(url) {
+    if (!url) return false;
+    try {
+      const u = new URL(url);
+      return u.protocol === "https:" || u.protocol === "http:";
+    } catch (_) {
+      return false;
+    }
+  }
+
   function uid() {
     return "L" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   }
@@ -60,6 +101,17 @@
     const m = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
     return y + "-" + m + "-" + day;
+  }
+
+  function figureHtml(ex) {
+    if (anatomy && anatomy.figureForExercise) return anatomy.figureForExercise(ex);
+    return `<div class="card-emoji lg">${ex.emoji || "💪"}</div>`;
+  }
+
+  function formSvgs(ex) {
+    const kind = (ex && ex.formCue) || "spine";
+    if (anatomy && anatomy.formCompare) return anatomy.formCompare(kind);
+    return { wrong: "", right: "" };
   }
 
   /* —— Views —— */
@@ -76,6 +128,10 @@
       closeDetail();
       renderMoves();
     }
+    if (name === "shorts") {
+      closeDetail();
+      renderShorts();
+    }
     if (name === "log") renderLog();
   }
 
@@ -84,10 +140,7 @@
     if (!grid) return;
     grid.innerHTML = data.muscles
       .map((m) => {
-        const moves = (m.moves || [])
-          .map(byId)
-          .filter(Boolean)
-          .slice(0, 4);
+        const moves = (m.moves || []).map(byId).filter(Boolean).slice(0, 4);
         const chips = moves
           .map(
             (ex) =>
@@ -163,23 +216,129 @@
       .join("");
   }
 
-  function openDetail(id) {
+  function renderShorts() {
+    const grid = $("#dayGrid");
+    if (!grid) return;
+    const days = (data.challenge && data.challenge.days) || [];
+    if (!days.length) {
+      grid.innerHTML = `<p class="empty">未有挑戰日程。</p>`;
+      return;
+    }
+    grid.innerHTML = days
+      .map((d) => {
+        const ex = byId(d.exerciseId);
+        if (!ex) return "";
+        const shortName = ex.name.length > 14 ? ex.name.slice(0, 13) + "…" : ex.name;
+        return `
+        <button type="button" class="day-card" data-open-day="${d.day}" data-open-ex-shorts="${ex.id}" aria-label="第 ${d.day} 日：${ex.name}">
+          <span class="day-badge">DAY ${d.day}</span>
+          <div class="day-fig">${figureHtml(ex)}</div>
+          <div class="day-name">${shortName}</div>
+        </button>`;
+      })
+      .join("");
+  }
+
+  function openDetail(id, fromShorts) {
     const ex = byId(id);
     const panel = $("#detailPanel");
     const body = $("#detailBody");
     if (!ex || !panel || !body) return;
     state.detailId = id;
+    state.detailFromShorts = !!fromShorts;
+    panel.classList.toggle("shorts-mode", !!fromShorts);
+    const toolbar = $("#detailToolbarLabel");
+    if (toolbar) toolbar.textContent = fromShorts ? "短片教學詳情" : "動作教學";
+
     const tags = ex.muscles.map((m) => `<span class="tag">${muscleName(m)}</span>`).join("");
     const steps = ex.steps.map((s, i) => `<li><span class="step-n">${i + 1}</span>${s}</li>`).join("");
     const mistakes = ex.mistakes.map((s) => `<li>${s}</li>`).join("");
-    body.innerHTML = `
+    const badge = ex.muscleBadge || muscleName(ex.muscles[0] || "");
+    const forms = formSvgs(ex);
+    const wrongCue = ex.wrongCue || "姿勢變形";
+    const rightCue = ex.rightCue || "保持中立穩定";
+    const videoUrl = getVideoUrl(ex.id);
+    const videoPreview = videoUrl
+      ? `<p class="video-link-preview">已存連結：<a href="${escapeAttr(videoUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(videoUrl)}</a></p>`
+      : "";
+
+    const shortsBlocks = `
+      <div class="muscle-banner">
+        <div class="mb-icon">${figureHtml(ex)}</div>
+        <div>
+          <div class="mb-label">${escapeHtml(badge)}</div>
+          <p class="mb-sub">${escapeHtml(ex.name)} · <span class="pill ${ex.category}">${catLabel(ex.category)}</span></p>
+        </div>
+      </div>
+
+      <div class="form-split" aria-label="錯誤與正確對比">
+        <div class="form-panel wrong">
+          <span class="form-badge" aria-label="錯誤">✕</span>
+          <div class="form-fig">${forms.wrong}</div>
+          <div class="form-cue">${escapeHtml(wrongCue)}</div>
+        </div>
+        <div class="form-panel right">
+          <span class="form-badge" aria-label="正確">✓</span>
+          <div class="form-fig">${forms.right}</div>
+          <div class="form-cue">${escapeHtml(rightCue)}</div>
+        </div>
+      </div>
+
+      <div class="demo-split" aria-label="肌群與組數">
+        <div class="demo-left">${figureHtml(ex)}</div>
+        <div class="demo-right">
+          <div class="rx">${escapeHtml(ex.prescription)}</div>
+          <p class="rx-sub">目標：${ex.muscles.map(muscleName).join("、")}</p>
+          <p class="rx-sub">示意解剖高亮 · 非醫學圖</p>
+        </div>
+      </div>
+
+      <section class="video-slot">
+        <h3>短片位</h3>
+        <div class="video-placeholder">
+          <strong>稍後可加短片連結</strong>
+          <span>唔會假嵌入他牌影片。請貼上你自己有權使用嘅 YouTube／短片網址，只存本機。</span>
+        </div>
+        <label class="field" for="videoUrlInput">自備短片網址（可選）</label>
+        <div class="video-row">
+          <input type="url" id="videoUrlInput" placeholder="https://www.youtube.com/watch?v=…" value="${escapeAttr(videoUrl)}" autocomplete="off" />
+          <button type="button" class="btn primary" data-save-video="${ex.id}">儲存</button>
+        </div>
+        ${videoPreview}
+        <p class="video-embed-note">鍵：fitnessCoachLite.videos.v1 · 清空網址再儲存即刪除</p>
+      </section>
+    `;
+
+    const basicHero = fromShorts
+      ? ""
+      : `
       <div class="detail-hero">
         <span class="card-emoji lg" aria-hidden="true">${ex.emoji}</span>
         <div>
           <h2 id="detailTitle">${ex.name}</h2>
           <p class="muted"><span class="pill ${ex.category}">${catLabel(ex.category)}</span> ${tags}</p>
         </div>
-      </div>
+      </div>`;
+
+    // When from shorts, title is in banner; still need id for a11y
+    const titleHidden = fromShorts ? `<h2 id="detailTitle" class="visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">${escapeHtml(ex.name)}</h2>` : "";
+
+    body.innerHTML = `
+      ${titleHidden}
+      ${fromShorts ? shortsBlocks : basicHero}
+      ${!fromShorts ? `
+      <div class="form-split" aria-label="錯誤與正確對比">
+        <div class="form-panel wrong">
+          <span class="form-badge" aria-label="錯誤">✕</span>
+          <div class="form-fig">${forms.wrong}</div>
+          <div class="form-cue">${escapeHtml(wrongCue)}</div>
+        </div>
+        <div class="form-panel right">
+          <span class="form-badge" aria-label="正確">✓</span>
+          <div class="form-fig">${forms.right}</div>
+          <div class="form-cue">${escapeHtml(rightCue)}</div>
+        </div>
+      </div>` : ""}
       <section class="detail-block">
         <h3>步驟</h3>
         <ol class="step-list">${steps}</ol>
@@ -196,25 +355,46 @@
         <h3>安全提示</h3>
         <p>${ex.safety}</p>
       </section>
+      ${!fromShorts ? `
+      <section class="video-slot">
+        <h3>短片位</h3>
+        <div class="video-placeholder">
+          <strong>稍後可加短片連結</strong>
+          <span>貼上自備網址，本機儲存；無假嵌入。</span>
+        </div>
+        <label class="field" for="videoUrlInput">自備短片網址（可選）</label>
+        <div class="video-row">
+          <input type="url" id="videoUrlInput" placeholder="https://…" value="${escapeAttr(videoUrl)}" autocomplete="off" />
+          <button type="button" class="btn primary" data-save-video="${ex.id}">儲存</button>
+        </div>
+        ${videoPreview}
+      </section>` : ""}
       <button type="button" class="btn primary block" data-quick-log="${ex.id}">加入今日訓練記錄</button>
       <p class="muted tiny center">示意教學 · 非醫療建議 · 請咨詢專業教練</p>
     `;
     panel.classList.add("open");
     panel.setAttribute("aria-hidden", "false");
     const bd = $("#detailBackdrop");
-    if (bd) { bd.classList.add("open"); bd.setAttribute("aria-hidden", "false"); }
+    if (bd) {
+      bd.classList.add("open");
+      bd.setAttribute("aria-hidden", "false");
+    }
     document.body.classList.add("detail-open");
   }
 
   function closeDetail() {
     state.detailId = null;
+    state.detailFromShorts = false;
     const panel = $("#detailPanel");
     if (panel) {
-      panel.classList.remove("open");
+      panel.classList.remove("open", "shorts-mode");
       panel.setAttribute("aria-hidden", "true");
     }
     const bd = $("#detailBackdrop");
-    if (bd) { bd.classList.remove("open"); bd.setAttribute("aria-hidden", "true"); }
+    if (bd) {
+      bd.classList.remove("open");
+      bd.setAttribute("aria-hidden", "true");
+    }
     document.body.classList.remove("detail-open");
   }
 
@@ -289,7 +469,7 @@
       summary.textContent = `本機共 ${all.length} 筆 · 目前顯示 ${logs.length} 筆`;
     }
     if (!logs.length) {
-      listEl.innerHTML = `<p class="empty">未有訓練記錄。去「儀器／動作」撳「今日訓練」即可新增。</p>`;
+      listEl.innerHTML = `<p class="empty">未有訓練記錄。去「儀器／動作」或「短片教學」撳「今日訓練」即可新增。</p>`;
       return;
     }
     listEl.innerHTML = logs
@@ -323,6 +503,10 @@
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
+  }
+
+  function escapeAttr(s) {
+    return escapeHtml(s).replace(/'/g, "&#39;");
   }
 
   let toastTimer = null;
@@ -395,9 +579,14 @@
       showView(t.dataset.view);
       return;
     }
+    const openShorts = ev.target.closest("[data-open-ex-shorts]");
+    if (openShorts) {
+      openDetail(openShorts.dataset.openExShorts, true);
+      return;
+    }
     const openEx = ev.target.closest("[data-open-ex]");
     if (openEx) {
-      openDetail(openEx.dataset.openEx);
+      openDetail(openEx.dataset.openEx, false);
       return;
     }
     const goto = ev.target.closest("[data-goto-moves]");
@@ -411,6 +600,20 @@
     const quick = ev.target.closest("[data-quick-log]");
     if (quick) {
       openQuickLog(quick.dataset.quickLog);
+      return;
+    }
+    const saveVid = ev.target.closest("[data-save-video]");
+    if (saveVid) {
+      const id = saveVid.dataset.saveVideo;
+      const input = $("#videoUrlInput");
+      const url = input ? input.value.trim() : "";
+      if (url && !isLikelyVideoUrl(url)) {
+        toast("請輸入有效網址（http／https）");
+        return;
+      }
+      setVideoUrl(id, url);
+      toast(url ? "已儲存短片連結" : "已清除短片連結");
+      openDetail(id, state.detailFromShorts);
       return;
     }
     const del = ev.target.closest("[data-del-log]");
@@ -440,9 +643,10 @@
   function initStats() {
     const gym = data.exercises.filter((e) => e.category === "gym").length;
     const home = data.exercises.filter((e) => e.category === "home").length;
+    const days = (data.challenge && data.challenge.days && data.challenge.days.length) || 0;
     const el = $("#aboutStats");
     if (el) {
-      el.textContent = `而家收錄：健身房器械 ${gym} 款 · 家用／徒手／啞鈴 ${home} 款 · 部位 ${data.muscles.length} 個`;
+      el.textContent = `而家收錄：健身房器械 ${gym} 款 · 家用／徒手／啞鈴 ${home} 款 · 部位 ${data.muscles.length} 個 · 挑戰 ${days} 日`;
     }
   }
 
