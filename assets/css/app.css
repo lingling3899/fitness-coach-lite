@@ -624,6 +624,163 @@ body.detail-open #detailBackdrop {
   border-top: 1px solid rgba(232, 197, 71, 0.25);
 }
 
+
+/* —— 圖解目錄海報卡（20261028i） —— */
+.catalog-filters {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.catalog-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.catalog-chip-row.thin {
+  gap: 5px;
+}
+.catalog-chip {
+  appearance: none;
+  border: 1.5px solid var(--gold-dim);
+  background: rgba(232, 197, 71, 0.08);
+  color: var(--gold);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  min-height: 44px;
+  line-height: 1.2;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.catalog-chip.ghost {
+  background: transparent;
+  border-color: rgba(255,255,255,0.18);
+  color: #d1d5db;
+  font-weight: 600;
+  font-size: 0.72rem;
+  padding: 6px 11px;
+  min-height: 40px;
+}
+.catalog-chip.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #111;
+}
+.catalog-chip.ghost.active {
+  background: rgba(232, 197, 71, 0.22);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.catalog-chip:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.poster-catalog {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding-bottom: 24px;
+}
+@media (min-width: 560px) {
+  .poster-catalog {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+@media (min-width: 900px) {
+  .poster-catalog {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    max-width: 920px;
+  }
+}
+
+.poster-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  background: var(--mm-card-bg);
+  border: 1.5px solid var(--gold);
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(232, 197, 71, 0.15);
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  min-height: 44px;
+  aspect-ratio: 3 / 4;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.poster-card:hover,
+.poster-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55), 0 0 0 2px var(--gold);
+  outline: none;
+}
+.poster-card:active {
+  transform: scale(0.98);
+}
+.poster-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  background: rgba(30, 30, 30, 0.82);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  line-height: 1.3;
+  border: 1px solid rgba(255,255,255,0.18);
+  backdrop-filter: blur(4px);
+}
+.poster-media {
+  flex: 1 1 auto;
+  min-height: 0;
+  background: #111;
+  position: relative;
+  overflow: hidden;
+}
+.poster-media .poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+.poster-media .day-fig {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  background: #f3f4f6;
+}
+.poster-name {
+  flex: 0 0 auto;
+  background: var(--mm-namebar);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 650;
+  padding: 8px 8px 10px;
+  line-height: 1.25;
+  min-height: 2.7em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-top: 1px solid rgba(232, 197, 71, 0.28);
+  letter-spacing: 0.01em;
+}
+@media (max-width: 380px) {
+  .poster-name { font-size: 0.64rem; padding: 6px 5px 8px; }
+}
+
 /* Detail short-form layout */
 .muscle-banner {
   display: flex;

@@ -6,7 +6,7 @@
   const VIDEO_KEY = "fitnessCoachLite.videos.v1";
   const USERS_KEY = "fitnessCoachLite.users.v1";
   const SESSION_KEY = "fitnessCoachLite.session.v1";
-  const CACHE = "20261028h";
+  const CACHE = "20261028i";
   const BUNDLED_VIDEOS = {
     "db-row": { src: "assets/videos/db-row.mp4", poster: "assets/videos/db-row.jpg" },
     "db-shoulder-press": { src: "assets/videos/db-shoulder-press.mp4", poster: "assets/videos/db-shoulder-press.jpg" },
@@ -47,7 +47,9 @@
     logFilterMuscle: "",
     logFilterDate: "",
     goalQuery: "",
-    tipIndex: 0
+    tipIndex: 0,
+    catalogMode: "all",
+    catalogCategory: ""
   };
 
   const GOAL_CHIPS = [
@@ -279,11 +281,11 @@
     if (isLoggedIn()) {
       row.innerHTML = `
         <button type="button" class="btn primary" data-view-jump="log">去記今日訓練</button>
-        <button type="button" class="btn ghost" data-view-jump="shorts">睇短片教學</button>`;
+        <button type="button" class="btn ghost" data-view-jump="shorts">睇圖解目錄</button>`;
     } else {
       row.innerHTML = `
         <button type="button" class="btn primary" data-open-auth data-auth-tab="register">註冊／登入</button>
-        <button type="button" class="btn ghost" data-view-jump="shorts">睇短片教學</button>`;
+        <button type="button" class="btn ghost" data-view-jump="shorts">睇圖解目錄</button>`;
     }
   }
 
@@ -794,26 +796,91 @@
       .join("");
   }
 
+  function challengeDayByExercise() {
+    const map = {};
+    const days = (data.challenge && data.challenge.days) || [];
+    days.forEach((d) => {
+      if (d.exerciseId && map[d.exerciseId] == null) map[d.exerciseId] = d.day;
+    });
+    return map;
+  }
+
+  function catalogEntries() {
+    const dayMap = challengeDayByExercise();
+    if (state.catalogMode === "challenge") {
+      const days = (data.challenge && data.challenge.days) || [];
+      return days
+        .map((d) => {
+          const ex = byId(d.exerciseId);
+          if (!ex) return null;
+          return { ex, badge: "DAY " + d.day, day: d.day, key: "d" + d.day + "-" + ex.id };
+        })
+        .filter(Boolean);
+    }
+    // 全部圖解：18 款有海報嘅動作（BUNDLED_VIDEOS 順序）
+    const ids = Object.keys(BUNDLED_VIDEOS);
+    let n = 0;
+    return ids
+      .map((id) => {
+        const ex = byId(id);
+        if (!ex) return null;
+        n += 1;
+        const day = dayMap[id];
+        const badge = day != null ? "DAY " + day : "#" + n;
+        return { ex, badge, day: day || n, key: "all-" + id };
+      })
+      .filter(Boolean);
+  }
+
+  function syncCatalogChips() {
+    $$("[data-catalog-mode]").forEach((b) => {
+      b.classList.toggle("active", b.dataset.catalogMode === state.catalogMode);
+      b.setAttribute("aria-pressed", b.dataset.catalogMode === state.catalogMode ? "true" : "false");
+    });
+    $$("[data-catalog-cat]").forEach((b) => {
+      const cat = b.dataset.catalogCat;
+      const on = (cat === "" && !state.catalogCategory) || cat === state.catalogCategory;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
   function renderShorts() {
     const grid = $("#dayGrid");
     if (!grid) return;
-    const days = (data.challenge && data.challenge.days) || [];
-    if (!days.length) {
-      grid.innerHTML = `<p class="empty">未有挑戰日程。</p>`;
+    syncCatalogChips();
+    let entries = catalogEntries();
+    if (state.catalogCategory) {
+      entries = entries.filter((e) => e.ex.category === state.catalogCategory);
+    }
+    const countEl = $("#catalogCount");
+    if (countEl) {
+      const modeLabel = state.catalogMode === "challenge" ? "21 日挑戰" : "全部圖解";
+      const catLabelText =
+        state.catalogCategory === "gym"
+          ? " · 健身房"
+          : state.catalogCategory === "home"
+            ? " · 家用"
+            : "";
+      countEl.textContent = modeLabel + catLabelText + " · " + entries.length + " 款";
+    }
+    if (!entries.length) {
+      grid.innerHTML = `<p class="empty">呢個篩選未有圖解。試吓換「全部圖解」或清類別篩選。</p>`;
       return;
     }
-    grid.innerHTML = days
-      .map((d) => {
-        const ex = byId(d.exerciseId);
-        if (!ex) return "";
-        const shortName = ex.name.length > 14 ? ex.name.slice(0, 13) + "…" : ex.name;
-        const hasVid = !!getBundledVideo(ex.id);
+    grid.innerHTML = entries
+      .map(({ ex, badge, key }) => {
+        const bundled = getBundledVideo(ex.id);
+        const poster = bundled ? bundled.poster + "?v=" + CACHE : "";
+        const shortName = ex.name.length > 16 ? ex.name.slice(0, 15) + "…" : ex.name;
+        const img = poster
+          ? `<img class="poster-img" src="${escapeAttr(poster)}" alt="" loading="lazy" decoding="async" />`
+          : `<div class="day-fig">${figureHtml(ex)}</div>`;
         return `
-        <button type="button" class="day-card" data-open-day="${d.day}" data-open-ex-shorts="${ex.id}" aria-label="第 ${d.day} 日：${ex.name}">
-          <span class="day-badge">DAY ${d.day}</span>
-          ${hasVid ? `<span class="vid-badge">有短片</span>` : ""}
-          <div class="day-fig">${figureHtml(ex)}</div>
-          <div class="day-name">${shortName}</div>
+        <button type="button" class="poster-card" data-open-ex-shorts="${ex.id}" data-catalog-key="${key}" aria-label="${escapeAttr(ex.name)}：撳入教學">
+          <span class="poster-badge">${badge}</span>
+          <div class="poster-media">${img}</div>
+          <div class="poster-name">${escapeHtml(shortName)}</div>
         </button>`;
       })
       .join("");
@@ -828,7 +895,7 @@
     state.detailFromShorts = !!fromShorts;
     panel.classList.toggle("shorts-mode", !!fromShorts);
     const toolbar = $("#detailToolbarLabel");
-    if (toolbar) toolbar.textContent = fromShorts ? "短片教學詳情" : "動作教學";
+    if (toolbar) toolbar.textContent = fromShorts ? "圖解教學詳情" : "動作教學";
 
     const tags = ex.muscles.map((m) => `<span class="tag">${muscleName(m)}</span>`).join("");
     const steps = ex.steps.map((s, i) => `<li><span class="step-n">${i + 1}</span>${s}</li>`).join("");
@@ -1327,6 +1394,18 @@
     }
     if (ev.target.id === "dailyTipNext") {
       nextDailyTip();
+      return;
+    }
+    const catalogModeBtn = ev.target.closest("[data-catalog-mode]");
+    if (catalogModeBtn) {
+      state.catalogMode = catalogModeBtn.dataset.catalogMode || "all";
+      renderShorts();
+      return;
+    }
+    const catalogCatBtn = ev.target.closest("[data-catalog-cat]");
+    if (catalogCatBtn) {
+      state.catalogCategory = catalogCatBtn.dataset.catalogCat || "";
+      renderShorts();
       return;
     }
     if (ev.target.id === "clearLogFilters") {
