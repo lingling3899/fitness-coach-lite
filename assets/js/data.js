@@ -7,8 +7,8 @@ window.FITNESS_DATA = {
       emoji: "💪",
       tip: "練胸要留意肩胛微微後夾、唔好聳肩。推嘅時候呼氣，控制下放。新手先學伏地挺身同胸推機，再加蝴蝶夾胸。",
       targets: "胸大肌、前三角肌、三頭肌（輔助）",
-      aliases: ["胸", "胸部", "胸肌", "上胸", "下胸", "增肌胸", "pecs", "chest", "推胸"],
-      moves: ["pushup", "smith-bench", "pec-deck", "dumbbell-press-home"]
+      aliases: ["胸", "胸部", "胸肌", "上胸", "下胸", "增肌胸", "pecs", "chest", "推胸", "推胸機", "坐姿推胸"],
+      moves: ["pushup", "smith-bench", "chest-press-machine", "pec-deck", "dumbbell-press-home"]
     },
     {
       id: "back",
@@ -43,8 +43,8 @@ window.FITNESS_DATA = {
       emoji: "🦵",
       tip: "下肢係全身力量基礎。深蹲同腿舉注意膝蓋對準腳尖方向，腰背保持自然中立。家用可用徒手深蹲、弓步、臀橋起步。",
       targets: "股四頭、腘繩肌、臀大肌、小腿（輔助）",
-      aliases: ["腿", "下肢", "大腿", "小腿", "股四", "增肌腿", "legs", "quads", "hamstrings"],
-      moves: ["smith-squat", "leg-press", "bw-squat", "lunge", "glute-bridge"]
+      aliases: ["腿", "下肢", "大腿", "小腿", "股四", "增肌腿", "legs", "quads", "hamstrings", "蹬腿", "踏板", "腿伸展", "伸膝"],
+      moves: ["smith-squat", "leg-press", "dual-pedal-press", "leg-extension", "bw-squat", "lunge", "glute-bridge"]
     },
     {
       id: "glutes",
@@ -53,7 +53,7 @@ window.FITNESS_DATA = {
       tip: "練臀重點係髖鉸鏈同頂端夾臀，唔好淨係用腰拱起代替。臀橋、弓步、深蹲都有助臀部發力；控制下放效果更好。",
       targets: "臀大肌、臀中肌（穩定）、腘繩肌（輔助）",
       aliases: ["臀", "臀部", "屁股", "翹臀", "臀肌", "glutes", "glute"],
-      moves: ["glute-bridge", "lunge", "bw-squat", "smith-squat", "leg-press"]
+      moves: ["glute-bridge", "lunge", "bw-squat", "smith-squat", "leg-press", "dual-pedal-press"]
     },
     {
       id: "core",
@@ -248,6 +248,68 @@ window.FITNESS_DATA = {
       mistakes: ["肘離開身側前後甩", "用肩同胸推", "重量過重動作變形", "腕過度屈曲"],
       prescription: "新手 3 組 × 10–15 次",
       safety: "肘關節唔適即減重或停；繩索版可微外展手腕，感覺更集中三頭。"
+    },
+
+
+    {
+      id: "dual-pedal-press",
+      name: "雙腳踏板蹬腿（坐姿）",
+      category: "gym",
+      muscles: ["legs", "glutes"],
+      formCue: "knee",
+      wrongCue: "臀離墊、膝內扣",
+      rightCue: "背貼墊、膝跟腳尖",
+      muscleBadge: "腿",
+      emoji: "🦿",
+      steps: [
+        "坐穩，背貼靠墊；雙腳分別放喺兩塊獨立踏板上（約中位）。",
+        "可雙腳一齊推，或者左右單邊輪流做。",
+        "呼氣用腳跟蹬出，身／座椅向後推上去，頂端唔鎖死膝。",
+        "吸氣控制屈曲膝蓋還原，腰背保持貼墊、核心輕收。"
+      ],
+      mistakes: ["臀部離開靠墊", "膝蓋內扣", "鎖死膝蓋猛蹬", "單邊時軀幹側傾"],
+      prescription: "新手 3 組 × 10–15 次（單邊則每側 8–12 次）",
+      safety: "深度以腰能貼住為準；獨立踏板可練左右平衡，先輕重量求軌跡。示意教學，非醫療建議。"
+    },
+    {
+      id: "leg-extension",
+      name: "腿伸展機",
+      category: "gym",
+      muscles: ["legs"],
+      formCue: "knee",
+      wrongCue: "借衝力甩起、臀離座",
+      rightCue: "控速伸膝、背貼墊",
+      muscleBadge: "股四",
+      emoji: "🦵",
+      steps: [
+        "座椅調至膝關節對準機軸；小腿／腳腕抵住前方滾墊。",
+        "可雙腳一齊提起，或者左右做一邊。",
+        "呼氣伸直膝蓋將滾墊向上抬起，頂端輕停、唔猛鎖死。",
+        "吸氣控制下放至舒適屈曲角度，腰背貼靠墊。"
+      ],
+      mistakes: ["用衝力甩起", "臀部離開座位", "過度鎖死膝蓋", "重量過重致膝前不適"],
+      prescription: "新手 3 組 × 10–15 次（單邊則每側 8–12 次）",
+      safety: "膝前痛或不適即減重／停；適合作腿日輔助，唔建議一開始用極重。示意非醫療。"
+    },
+    {
+      id: "chest-press-machine",
+      name: "坐姿推胸機",
+      category: "gym",
+      muscles: ["chest", "arms"],
+      formCue: "spine",
+      wrongCue: "聳肩、過度拱腰",
+      rightCue: "肩胛後夾、背貼墊",
+      muscleBadge: "胸",
+      emoji: "🦾",
+      steps: [
+        "座椅調至握把約與胸口中位同高，背貼窄靠墊。",
+        "雙手握住兩側獨立槓桿手把，肩胛微微後夾。",
+        "呼氣向前推至手臂接近伸直（唔鎖死），感受胸肌發力。",
+        "吸氣控制還原至胸前有拉伸感但唔過肩。"
+      ],
+      mistakes: ["聳肩", "用衝力甩推", "過度拱腰離墊", "下放過深扯肩"],
+      prescription: "新手 3 組 × 8–12 次",
+      safety: "獨立手把可單邊練；肩有舊患先咨詢專業人士，重量循序。示意教學，非醫療建議。"
     },
 
     /* —— 家用／徒手／啞鈴 —— */
@@ -445,7 +507,7 @@ window.FITNESS_DATA = {
 
   challenge: {
     title: "21 日入門挑戰",
-    subtitle: "每日一動作 · 示意圖解 · 而家內建 18 款解剖圖解示意短片 · 其餘可自備連結",
+    subtitle: "每日一動作 · 示意圖解 · 而家內建 21 款解剖圖解示意短片 · 其餘可自備連結",
     days: [
       { day: 1, exerciseId: "pushup" },
       { day: 2, exerciseId: "db-curl" },
@@ -465,9 +527,9 @@ window.FITNESS_DATA = {
       { day: 16, exerciseId: "leg-press" },
       { day: 17, exerciseId: "seated-row" },
       { day: 18, exerciseId: "smith-bench" },
-      { day: 19, exerciseId: "db-curl" },
-      { day: 20, exerciseId: "plank" },
-      { day: 21, exerciseId: "bw-squat" }
+      { day: 19, exerciseId: "dual-pedal-press" },
+      { day: 20, exerciseId: "leg-extension" },
+      { day: 21, exerciseId: "chest-press-machine" }
     ]
   }
 };

@@ -6,7 +6,7 @@
   const VIDEO_KEY = "fitnessCoachLite.videos.v1";
   const USERS_KEY = "fitnessCoachLite.users.v1";
   const SESSION_KEY = "fitnessCoachLite.session.v1";
-  const CACHE = "20261028i";
+  const CACHE = "20261028j";
   const BUNDLED_VIDEOS = {
     "db-row": { src: "assets/videos/db-row.mp4", poster: "assets/videos/db-row.jpg" },
     "db-shoulder-press": { src: "assets/videos/db-shoulder-press.mp4", poster: "assets/videos/db-shoulder-press.jpg" },
@@ -25,7 +25,10 @@
     "triceps-pushdown": { src: "assets/videos/triceps-pushdown.mp4", poster: "assets/videos/triceps-pushdown.jpg" },
     "smith-bench": { src: "assets/videos/smith-bench.mp4", poster: "assets/videos/smith-bench.jpg" },
     "shoulder-press-machine": { src: "assets/videos/shoulder-press-machine.mp4", poster: "assets/videos/shoulder-press-machine.jpg" },
-    "dumbbell-press-home": { src: "assets/videos/dumbbell-press-home.mp4", poster: "assets/videos/dumbbell-press-home.jpg" }
+    "dumbbell-press-home": { src: "assets/videos/dumbbell-press-home.mp4", poster: "assets/videos/dumbbell-press-home.jpg" },
+    "dual-pedal-press": { src: "assets/videos/dual-pedal-press.mp4", poster: "assets/videos/dual-pedal-press.jpg" },
+    "leg-extension": { src: "assets/videos/leg-extension.mp4", poster: "assets/videos/leg-extension.jpg" },
+    "chest-press-machine": { src: "assets/videos/chest-press-machine.mp4", poster: "assets/videos/chest-press-machine.jpg" }
   };
   const data = window.FITNESS_DATA;
   const anatomy = window.FITNESS_ANATOMY;
@@ -64,9 +67,9 @@
   ];
 
   const FULL_BODY_PICKS = {
-    push: ["pushup", "smith-bench", "dumbbell-press-home"],
+    push: ["pushup", "smith-bench", "chest-press-machine", "dumbbell-press-home"],
     pull: ["seated-row", "db-row", "lat-pulldown"],
-    legs: ["bw-squat", "smith-squat", "leg-press"],
+    legs: ["bw-squat", "smith-squat", "leg-press", "dual-pedal-press", "leg-extension"],
     core: ["plank", "glute-bridge"]
   };
 
@@ -421,7 +424,7 @@
         </div>`
       : `<div class="video-placeholder">
           <strong>未有內建短片</strong>
-          <span>可自備 YouTube／短片網址（本機儲存）。而家內建 18 款解剖圖解示意短片。</span>
+          <span>可自備 YouTube／短片網址（本機儲存）。而家內建 21 款解剖圖解示意短片。</span>
         </div>`;
     return `
       <section class="video-slot">
@@ -817,7 +820,7 @@
         })
         .filter(Boolean);
     }
-    // 全部圖解：18 款有海報嘅動作（BUNDLED_VIDEOS 順序）
+    // 全部圖解：21 款有海報嘅動作（BUNDLED_VIDEOS 順序）
     const ids = Object.keys(BUNDLED_VIDEOS);
     let n = 0;
     return ids
