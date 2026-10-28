@@ -2,7 +2,7 @@
 
 靜態精簡版：輸入想增肌部位即時建議儀器／動作、每日小 tips、按部位教練提示、健身房／家用動作教學、圖解目錄（全部海報＋21 日挑戰）、本機註冊／登入同個人訓練記錄。
 
-**預覽：** https://lingling3899.github.io/fitness-coach-lite/?v=20261029a
+**預覽：** https://lingling3899.github.io/fitness-coach-lite/?v=20261029c
 
 ## 功能
 
