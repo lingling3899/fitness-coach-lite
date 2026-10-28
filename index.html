@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-HK">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="健身教練 Lite：按部位教學、健身房／家用動作示範、本機訓練記錄。示意非醫療，請咨詢專業教練。" />
+  <meta name="theme-color" content="#0f1419" />
+  <title>健身教練 Lite · 部位教學／儀器動作／訓練記錄</title>
+  <link rel="stylesheet" href="assets/css/app.css?v=20261028a" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">💪</div>
+        <div class="brand-text">
+          <h1>健身教練 Lite</h1>
+          <p>部位教學　｜　儀器／動作　｜　訓練記錄　｜　說明</p>
+        </div>
+      </div>
+      <nav class="nav-tabs" aria-label="主要分頁">
+        <button type="button" class="active" data-view="muscles">部位教學</button>
+        <button type="button" data-view="moves">儀器／動作</button>
+        <button type="button" data-view="log">訓練記錄</button>
+        <button type="button" data-view="about">說明</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- 部位教學 -->
+    <section id="view-muscles" class="view active" aria-labelledby="muscles-title">
+      <div class="panel">
+        <h2 id="muscles-title">教練按部位帶路</h2>
+        <p class="lead">揀胸／背／肩／手臂／腿／核心，睇短提示同推薦動作。再入「儀器／動作」睇步驟同記訓練。</p>
+      </div>
+      <div id="muscleGrid" class="grid" aria-live="polite"></div>
+    </section>
+
+    <!-- 儀器／動作 -->
+    <section id="view-moves" class="view" aria-labelledby="moves-title">
+      <div class="panel">
+        <h2 id="moves-title">儀器／動作一覽</h2>
+        <p class="lead">健身房器械同家用徒手／啞鈴精簡收錄。撳「教學詳情」睇步驟；「今日訓練」寫入本機記錄。</p>
+        <div class="filters">
+          <div>
+            <label class="field" for="categoryFilter">類別</label>
+            <select id="categoryFilter" aria-label="按類別篩選"></select>
+          </div>
+          <div>
+            <label class="field" for="muscleFilter">部位</label>
+            <select id="muscleFilter" aria-label="按部位篩選"></select>
+          </div>
+          <div class="full">
+            <label class="field" for="moveSearch">搜尋</label>
+            <input type="text" id="moveSearch" placeholder="動作名稱／部位…" autocomplete="off" />
+          </div>
+        </div>
+        <p class="count" id="moveCount"></p>
+      </div>
+      <div id="moveGrid" class="grid" aria-live="polite"></div>
+    </section>
+
+    <!-- 訓練記錄 -->
+    <section id="view-log" class="view" aria-labelledby="log-title">
+      <div class="panel">
+        <h2 id="log-title">訓練記錄</h2>
+        <p class="lead">只存於此裝置瀏覽器（localStorage），唔使登入、唔上傳雲端。</p>
+        <div class="filters">
+          <div>
+            <label class="field" for="logFilterDate">日期</label>
+            <input type="date" id="logFilterDate" />
+          </div>
+          <div>
+            <label class="field" for="logFilterMuscle">部位</label>
+            <select id="logFilterMuscle"></select>
+          </div>
+          <div class="full">
+            <button type="button" class="btn ghost block" id="clearLogFilters">清除篩選</button>
+          </div>
+        </div>
+        <p class="count" id="logSummary"></p>
+      </div>
+      <div id="logList" class="grid" aria-live="polite"></div>
+    </section>
+
+    <!-- 說明 -->
+    <section id="view-about" class="view" aria-labelledby="about-title">
+      <div class="panel">
+        <h2 id="about-title">關於健身教練 Lite</h2>
+        <p class="lead">靜態精簡版：部位教練提示、健身房／家用動作教學、本機訓練日誌。適合快速查同記，唔取代真人教練。</p>
+        <p id="aboutStats" class="count"></p>
+        <ul class="about-list">
+          <li><strong>部位教學</strong>：胸、背、肩、手臂、腿、核心 — 短提示＋推薦動作。</li>
+          <li><strong>儀器／動作</strong>：健身房常見器械同家用徒手／啞鈴各精簡數款；含步驟、常見錯誤、新手組數參考。</li>
+          <li><strong>訓練記錄</strong>：日期、動作、組數×次數、可選重量（kg）、備註；可篩選／刪除。</li>
+          <li><strong>私隱</strong>：資料鍵 <code>fitnessCoachLite.logs.v1</code>，只在本機。</li>
+        </ul>
+        <div class="disclaimer">
+          <strong>重要聲明：</strong>本站內容僅供一般健身教學示意，<strong>並非醫療建議</strong>，亦唔取代合格教練或物理治療指導。傷病、懷孕、慢性疾病或痛楚期間，請先咨詢醫生／專業教練。訓練請量力而為，注意熱身同安全。
+        </div>
+      </div>
+      <div class="panel">
+        <h3>版本</h3>
+        <p class="muted tiny">fitness-coach-lite · ?v=20261028a · GitHub Pages</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-foot">示意教學 · 非醫療／非報價 · 請咨詢專業教練</footer>
+
+  <!-- 詳情抽屜 -->
+  <div id="detailBackdrop" class="detail-backdrop" aria-hidden="true"></div>
+  <div id="detailPanel" class="detail-panel" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="detailTitle">
+    <div class="detail-toolbar">
+      <span>動作教學</span>
+      <button type="button" class="icon-btn" data-close-detail aria-label="關閉">✕</button>
+    </div>
+    <div class="detail-scroll" id="detailBody"></div>
+  </div>
+
+  <!-- 快速記錄 -->
+  <div id="logModal" class="modal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="logModalTitle">
+      <div class="log-top">
+        <div>
+          <h2 id="logModalTitle">今日訓練</h2>
+          <p class="muted tiny" id="logExName"></p>
+        </div>
+        <button type="button" class="icon-btn" data-close-log-modal aria-label="關閉">✕</button>
+      </div>
+      <form id="logForm">
+        <input type="hidden" id="logExId" />
+        <div class="form-grid">
+          <div class="full">
+            <label class="field" for="logDate">日期</label>
+            <input type="date" id="logDate" required />
+          </div>
+          <div>
+            <label class="field" for="logSets">組數</label>
+            <input type="number" id="logSets" min="1" max="20" step="1" value="3" required />
+          </div>
+          <div>
+            <label class="field" for="logReps">每組次數</label>
+            <input type="number" id="logReps" min="1" max="100" step="1" value="10" required />
+          </div>
+          <div class="full">
+            <label class="field" for="logWeight">重量（kg，可留空）</label>
+            <input type="number" id="logWeight" min="0" max="500" step="0.5" placeholder="自體重量可留空" />
+          </div>
+          <div class="full">
+            <label class="field" for="logNotes">備註</label>
+            <textarea id="logNotes" placeholder="感覺、設備、休息時間…"></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn primary block">儲存記錄</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="assets/js/data.js?v=20261028a"></script>
+  <script src="assets/js/app.js?v=20261028a"></script>
+</body>
+</html>
