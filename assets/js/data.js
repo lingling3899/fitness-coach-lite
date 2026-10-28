@@ -421,7 +421,7 @@ window.FITNESS_DATA = {
 
   challenge: {
     title: "21 日入門挑戰",
-    subtitle: "每日一動作 · 示意圖解 · 可自備短片連結",
+    subtitle: "每日一動作 · 示意圖解 · 已內建 3 款解剖短片 · 其餘可自備連結",
     days: [
       { day: 1, exerciseId: "pushup" },
       { day: 2, exerciseId: "db-curl" },

@@ -4,6 +4,12 @@
 
   const STORAGE_KEY = "fitnessCoachLite.logs.v1";
   const VIDEO_KEY = "fitnessCoachLite.videos.v1";
+  const CACHE = "20261028c";
+  const BUNDLED_VIDEOS = {
+    "db-row": { src: "assets/videos/db-row.mp4", poster: "assets/videos/db-row.jpg" },
+    "db-shoulder-press": { src: "assets/videos/db-shoulder-press.mp4", poster: "assets/videos/db-shoulder-press.jpg" },
+    "db-curl": { src: "assets/videos/db-curl.mp4", poster: "assets/videos/db-curl.jpg" }
+  };
   const data = window.FITNESS_DATA;
   const anatomy = window.FITNESS_ANATOMY;
   if (!data) {
@@ -79,6 +85,39 @@
     if (!cleaned) delete map[exerciseId];
     else map[exerciseId] = cleaned;
     saveVideos(map);
+  }
+
+  function getBundledVideo(exerciseId) {
+    return BUNDLED_VIDEOS[exerciseId] || null;
+  }
+
+  function videoSlotHtml(ex) {
+    const bundled = getBundledVideo(ex.id);
+    const videoUrl = getVideoUrl(ex.id);
+    const videoPreview = videoUrl
+      ? `<p class="video-link-preview">已存連結：<a href="${escapeAttr(videoUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(videoUrl)}</a></p>`
+      : "";
+    const player = bundled
+      ? `<div class="bundled-video">
+          <video controls playsinline loop muted poster="${escapeAttr(bundled.poster)}?v=${CACHE}" src="${escapeAttr(bundled.src)}?v=${CACHE}"></video>
+          <p class="video-caption">解剖圖解示意短片（非真人）</p>
+        </div>`
+      : `<div class="video-placeholder">
+          <strong>未有內建短片</strong>
+          <span>可自備 YouTube／短片網址（本機儲存）。已內建 3 款：啞鈴划船、啞鈴肩推、啞鈴彎舉。</span>
+        </div>`;
+    return `
+      <section class="video-slot">
+        <h3>短片位</h3>
+        ${player}
+        <label class="field" for="videoUrlInput">自備短片網址（可選／額外）</label>
+        <div class="video-row">
+          <input type="url" id="videoUrlInput" placeholder="https://www.youtube.com/watch?v=…" value="${escapeAttr(videoUrl)}" autocomplete="off" />
+          <button type="button" class="btn primary" data-save-video="${ex.id}">儲存</button>
+        </div>
+        ${videoPreview}
+        <p class="video-embed-note">鍵：fitnessCoachLite.videos.v1 · 清空網址再儲存即刪除</p>
+      </section>`;
   }
 
   function isLikelyVideoUrl(url) {
@@ -229,9 +268,11 @@
         const ex = byId(d.exerciseId);
         if (!ex) return "";
         const shortName = ex.name.length > 14 ? ex.name.slice(0, 13) + "…" : ex.name;
+        const hasVid = !!getBundledVideo(ex.id);
         return `
         <button type="button" class="day-card" data-open-day="${d.day}" data-open-ex-shorts="${ex.id}" aria-label="第 ${d.day} 日：${ex.name}">
           <span class="day-badge">DAY ${d.day}</span>
+          ${hasVid ? `<span class="vid-badge">有短片</span>` : ""}
           <div class="day-fig">${figureHtml(ex)}</div>
           <div class="day-name">${shortName}</div>
         </button>`;
@@ -257,11 +298,6 @@
     const forms = formSvgs(ex);
     const wrongCue = ex.wrongCue || "姿勢變形";
     const rightCue = ex.rightCue || "保持中立穩定";
-    const videoUrl = getVideoUrl(ex.id);
-    const videoPreview = videoUrl
-      ? `<p class="video-link-preview">已存連結：<a href="${escapeAttr(videoUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(videoUrl)}</a></p>`
-      : "";
-
     const shortsBlocks = `
       <div class="muscle-banner">
         <div class="mb-icon">${figureHtml(ex)}</div>
@@ -293,20 +329,7 @@
         </div>
       </div>
 
-      <section class="video-slot">
-        <h3>短片位</h3>
-        <div class="video-placeholder">
-          <strong>稍後可加短片連結</strong>
-          <span>唔會假嵌入他牌影片。請貼上你自己有權使用嘅 YouTube／短片網址，只存本機。</span>
-        </div>
-        <label class="field" for="videoUrlInput">自備短片網址（可選）</label>
-        <div class="video-row">
-          <input type="url" id="videoUrlInput" placeholder="https://www.youtube.com/watch?v=…" value="${escapeAttr(videoUrl)}" autocomplete="off" />
-          <button type="button" class="btn primary" data-save-video="${ex.id}">儲存</button>
-        </div>
-        ${videoPreview}
-        <p class="video-embed-note">鍵：fitnessCoachLite.videos.v1 · 清空網址再儲存即刪除</p>
-      </section>
+      ${videoSlotHtml(ex)}
     `;
 
     const basicHero = fromShorts
@@ -355,20 +378,7 @@
         <h3>安全提示</h3>
         <p>${ex.safety}</p>
       </section>
-      ${!fromShorts ? `
-      <section class="video-slot">
-        <h3>短片位</h3>
-        <div class="video-placeholder">
-          <strong>稍後可加短片連結</strong>
-          <span>貼上自備網址，本機儲存；無假嵌入。</span>
-        </div>
-        <label class="field" for="videoUrlInput">自備短片網址（可選）</label>
-        <div class="video-row">
-          <input type="url" id="videoUrlInput" placeholder="https://…" value="${escapeAttr(videoUrl)}" autocomplete="off" />
-          <button type="button" class="btn primary" data-save-video="${ex.id}">儲存</button>
-        </div>
-        ${videoPreview}
-      </section>` : ""}
+      ${!fromShorts ? videoSlotHtml(ex) : ""}
       <button type="button" class="btn primary block" data-quick-log="${ex.id}">加入今日訓練記錄</button>
       <p class="muted tiny center">示意教學 · 非醫療建議 · 請咨詢專業教練</p>
     `;
@@ -646,7 +656,8 @@
     const days = (data.challenge && data.challenge.days && data.challenge.days.length) || 0;
     const el = $("#aboutStats");
     if (el) {
-      el.textContent = `而家收錄：健身房器械 ${gym} 款 · 家用／徒手／啞鈴 ${home} 款 · 部位 ${data.muscles.length} 個 · 挑戰 ${days} 日`;
+      const vids = Object.keys(BUNDLED_VIDEOS).length;
+      el.textContent = `而家收錄：健身房器械 ${gym} 款 · 家用／徒手／啞鈴 ${home} 款 · 部位 ${data.muscles.length} 個 · 挑戰 ${days} 日 · 內建解剖短片 ${vids} 款`;
     }
   }
 
