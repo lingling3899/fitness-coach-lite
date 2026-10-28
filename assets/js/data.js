@@ -7,6 +7,7 @@ window.FITNESS_DATA = {
       emoji: "💪",
       tip: "練胸要留意肩胛微微後夾、唔好聳肩。推嘅時候呼氣，控制下放。新手先學伏地挺身同胸推機，再加蝴蝶夾胸。",
       targets: "胸大肌、前三角肌、三頭肌（輔助）",
+      aliases: ["胸", "胸部", "胸肌", "上胸", "下胸", "增肌胸", "pecs", "chest", "推胸"],
       moves: ["pushup", "smith-bench", "pec-deck", "dumbbell-press-home"]
     },
     {
@@ -15,6 +16,7 @@ window.FITNESS_DATA = {
       emoji: "🫁",
       tip: "練背重點係「拉到肩胛骨郁」，唔係淨係手臂用力。坐姿划船同啞鈴划船最易學到感覺；高位下拉注意唔好過度後仰。",
       targets: "闊背肌、中下斜方、菱形肌、二頭（輔助）",
+      aliases: ["背", "背部", "後背", "闊背", "背肌", "增肌背", "back", "lats"],
       moves: ["seated-row", "lat-pulldown", "db-row", "face-pull"]
     },
     {
@@ -23,6 +25,7 @@ window.FITNESS_DATA = {
       emoji: "🏋️",
       tip: "肩關節較脆弱，重量由輕開始。肩推時手肘唔好過度外開；面拉有助後三角同肩胛穩定，建議每週加一兩組。",
       targets: "前／中／後三角肌、斜方上部（輔助）",
+      aliases: ["肩", "肩膀", "三角肌", "肩推", "增肌肩", "shoulders", "delts"],
       moves: ["shoulder-press-machine", "db-shoulder-press", "face-pull"]
     },
     {
@@ -31,6 +34,7 @@ window.FITNESS_DATA = {
       emoji: "🦾",
       tip: "二頭三頭都要練，先求動作完整再加重量。三頭下壓肘固定喺身側；啞鈴彎舉唔好借腰力甩。",
       targets: "肱二頭肌、肱三頭肌、前臂",
+      aliases: ["手臂", "手", "二頭", "三頭", "肱二頭", "肱三頭", "胳膊", "arms", "biceps", "triceps"],
       moves: ["triceps-pushdown", "db-curl", "pushup", "db-row"]
     },
     {
@@ -39,7 +43,17 @@ window.FITNESS_DATA = {
       emoji: "🦵",
       tip: "下肢係全身力量基礎。深蹲同腿舉注意膝蓋對準腳尖方向，腰背保持自然中立。家用可用徒手深蹲、弓步、臀橋起步。",
       targets: "股四頭、腘繩肌、臀大肌、小腿（輔助）",
+      aliases: ["腿", "下肢", "大腿", "小腿", "股四", "增肌腿", "legs", "quads", "hamstrings"],
       moves: ["smith-squat", "leg-press", "bw-squat", "lunge", "glute-bridge"]
+    },
+    {
+      id: "glutes",
+      name: "臀",
+      emoji: "🍑",
+      tip: "練臀重點係髖鉸鏈同頂端夾臀，唔好淨係用腰拱起代替。臀橋、弓步、深蹲都有助臀部發力；控制下放效果更好。",
+      targets: "臀大肌、臀中肌（穩定）、腘繩肌（輔助）",
+      aliases: ["臀", "臀部", "屁股", "翹臀", "臀肌", "glutes", "glute"],
+      moves: ["glute-bridge", "lunge", "bw-squat", "smith-squat", "leg-press"]
     },
     {
       id: "core",
@@ -47,6 +61,7 @@ window.FITNESS_DATA = {
       emoji: "🔥",
       tip: "核心唔止係腹肌，仲包括穩定腰椎同骨盆。平板撑先求時間同姿勢，再進階；呼吸要順，唔好閉氣用力。",
       targets: "腹直肌、腹橫肌、斜腹、豎脊肌（穩定）",
+      aliases: ["核心", "腹肌", "腹", "腰腹", "中軸", "core", "abs", "腹部"],
       moves: ["plank", "glute-bridge", "bw-squat"]
     }
   ],
@@ -57,7 +72,7 @@ window.FITNESS_DATA = {
       id: "smith-squat",
       name: "史密斯深蹲",
       category: "gym",
-      muscles: ["legs"],
+      muscles: ["legs", "glutes"],
       formCue: "knee",
       wrongCue: "膝內扣、腰過度塌",
       rightCue: "膝對腳尖、腰中立",
@@ -97,7 +112,7 @@ window.FITNESS_DATA = {
       id: "leg-press",
       name: "腿舉機",
       category: "gym",
-      muscles: ["legs"],
+      muscles: ["legs", "glutes"],
       formCue: "knee",
       wrongCue: "臀離墊、膝內扣",
       rightCue: "腰貼墊、膝跟腳尖",
@@ -240,7 +255,7 @@ window.FITNESS_DATA = {
       id: "bw-squat",
       name: "徒手深蹲",
       category: "home",
-      muscles: ["legs", "core"],
+      muscles: ["legs", "glutes", "core"],
       formCue: "knee",
       wrongCue: "膝內扣、彎腰",
       rightCue: "膝對腳尖、胸挺",
@@ -340,7 +355,7 @@ window.FITNESS_DATA = {
       id: "glute-bridge",
       name: "臀橋",
       category: "home",
-      muscles: ["legs", "core"],
+      muscles: ["glutes", "legs", "core"],
       formCue: "spine",
       wrongCue: "用腰拱代替夾臀",
       rightCue: "腳跟蹬、頂端夾臀",
@@ -360,7 +375,7 @@ window.FITNESS_DATA = {
       id: "lunge",
       name: "弓步蹲",
       category: "home",
-      muscles: ["legs"],
+      muscles: ["legs", "glutes"],
       formCue: "knee",
       wrongCue: "前膝內扣或失控",
       rightCue: "前膝對腳尖、軀幹直",
@@ -417,6 +432,15 @@ window.FITNESS_DATA = {
       prescription: "新手 3 組 × 8–12 次",
       safety: "地板版幅度較安全適合家用；起立時小心將啞鈴放低再起身。"
     }
+  ],
+
+
+  dailyTips: [
+    { id: "warm", emoji: "🔥", text: "開組前花 5–8 分鐘輕量活動同動態伸展，關節熱咗再加重，感覺會穩陣啲。" },
+    { id: "breathe", emoji: "🌬️", text: "發力時呼氣、下放時吸氣；唔好全程閉氣，尤其係推／蹲類動作。" },
+    { id: "progress", emoji: "📈", text: "進階可以好溫柔：同一動作先求姿勢穩，再慢慢加次數或極小重量，唔使每堂都衝 PR。" },
+    { id: "recover", emoji: "😴", text: "肌肉要休息先有空間適應。同一大肌群可隔日再練；睡眠同飲水都係訓練一部分。" },
+    { id: "form", emoji: "🎯", text: "寧願輕啲但軌跡清晰，都好過重量大到借腰借勢。有痛（尖銳）即停，唔好硬撐。" }
   ],
 
   challenge: {

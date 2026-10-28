@@ -6,7 +6,7 @@
   const VIDEO_KEY = "fitnessCoachLite.videos.v1";
   const USERS_KEY = "fitnessCoachLite.users.v1";
   const SESSION_KEY = "fitnessCoachLite.session.v1";
-  const CACHE = "20261028g";
+  const CACHE = "20261028h";
   const BUNDLED_VIDEOS = {
     "db-row": { src: "assets/videos/db-row.mp4", poster: "assets/videos/db-row.jpg" },
     "db-shoulder-press": { src: "assets/videos/db-shoulder-press.mp4", poster: "assets/videos/db-shoulder-press.jpg" },
@@ -45,7 +45,27 @@
     detailId: null,
     detailFromShorts: false,
     logFilterMuscle: "",
-    logFilterDate: ""
+    logFilterDate: "",
+    goalQuery: "",
+    tipIndex: 0
+  };
+
+  const GOAL_CHIPS = [
+    { id: "chest", label: "胸" },
+    { id: "back", label: "背" },
+    { id: "shoulders", label: "肩" },
+    { id: "arms", label: "手臂" },
+    { id: "legs", label: "腿" },
+    { id: "core", label: "核心" },
+    { id: "glutes", label: "臀" },
+    { id: "full", label: "全身" }
+  ];
+
+  const FULL_BODY_PICKS = {
+    push: ["pushup", "smith-bench", "dumbbell-press-home"],
+    pull: ["seated-row", "db-row", "lat-pulldown"],
+    legs: ["bw-squat", "smith-squat", "leg-press"],
+    core: ["plank", "glute-bridge"]
   };
 
   function byId(id) {
@@ -243,12 +263,28 @@
     const user = currentUser();
     if (!user) {
       chip.innerHTML = `<button type="button" class="btn ghost account-btn" id="authOpenBtn" data-open-auth>登入／註冊</button>`;
+      updateHeroCta();
       return;
     }
     const name = escapeHtml(user.displayName || user.username);
     chip.innerHTML = `
       <span class="account-name" title="${name}">${name}</span>
       <button type="button" class="btn ghost account-btn" id="logoutBtn" data-logout>登出</button>`;
+    updateHeroCta();
+  }
+
+  function updateHeroCta() {
+    const row = $("#heroCtaRow");
+    if (!row) return;
+    if (isLoggedIn()) {
+      row.innerHTML = `
+        <button type="button" class="btn primary" data-view-jump="log">去記今日訓練</button>
+        <button type="button" class="btn ghost" data-view-jump="shorts">睇短片教學</button>`;
+    } else {
+      row.innerHTML = `
+        <button type="button" class="btn primary" data-open-auth data-auth-tab="register">註冊／登入</button>
+        <button type="button" class="btn ghost" data-view-jump="shorts">睇短片教學</button>`;
+    }
   }
 
   function setAuthError(id, msg) {
@@ -294,7 +330,7 @@
       p.hidden = !on;
     });
     const title = $("#authModalTitle");
-    if (title) title.textContent = tab === "register" ? "註冊" : "登入";
+    if (title) title.textContent = tab === "register" ? "開帳戶" : "歡迎返嚟";
   }
 
   async function onLoginSubmit(ev) {
@@ -453,9 +489,225 @@
     if (name === "log") renderLog();
   }
 
+  function tipPool() {
+    const daily = (data.dailyTips || []).slice();
+    const fromMuscles = (data.muscles || []).map((m) => ({
+      id: "m-" + m.id,
+      emoji: m.emoji,
+      text: m.tip
+    }));
+    return daily.concat(fromMuscles);
+  }
+
+  function renderDailyTip() {
+    const el = $("#dailyTipText");
+    if (!el) return;
+    const pool = tipPool();
+    if (!pool.length) {
+      el.textContent = "熱身、控制呼吸、循序加重 — 穩陣先最重要。";
+      return;
+    }
+    if (state.tipIndex < 0 || state.tipIndex >= pool.length) state.tipIndex = 0;
+    const tip = pool[state.tipIndex];
+    el.innerHTML = `<span class="tip-emoji" aria-hidden="true">${tip.emoji || "💡"}</span> ${escapeHtml(tip.text)}`;
+  }
+
+  function nextDailyTip() {
+    const pool = tipPool();
+    if (!pool.length) return;
+    state.tipIndex = (state.tipIndex + 1) % pool.length;
+    renderDailyTip();
+  }
+
+  function normalizeGoalQuery(q) {
+    return String(q || "")
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "");
+  }
+
+  function matchMuscleIds(query) {
+    const q = normalizeGoalQuery(query);
+    if (!q) return { ids: [], full: false, unknown: false };
+    if (q === "全身" || q === "全身訓練" || q === "full" || q === "fullbody" || q === "wholebody") {
+      return { ids: [], full: true, unknown: false };
+    }
+    const hits = [];
+    data.muscles.forEach((m) => {
+      const names = [m.name, m.id].concat(m.aliases || []);
+      const matched = names.some((a) => {
+        const n = normalizeGoalQuery(a);
+        return n && (q === n || q.includes(n) || n.includes(q));
+      });
+      if (matched) hits.push(m.id);
+    });
+    // also map common free-text not covered if muscle missing
+    if (!hits.length) {
+      return { ids: [], full: false, unknown: true };
+    }
+    return { ids: hits, full: false, unknown: false };
+  }
+
+  function pickFullBodyMix() {
+    const out = [];
+    const seen = new Set();
+    Object.keys(FULL_BODY_PICKS).forEach((k) => {
+      const list = FULL_BODY_PICKS[k];
+      for (let i = 0; i < list.length; i++) {
+        const ex = byId(list[i]);
+        if (ex && !seen.has(ex.id)) {
+          seen.add(ex.id);
+          out.push(ex);
+          break;
+        }
+      }
+    });
+    return out;
+  }
+
+  function rankExercisesForMuscles(ids) {
+    const scored = data.exercises
+      .map((ex) => {
+        const overlap = ex.muscles.filter((m) => ids.includes(m)).length;
+        return { ex, overlap };
+      })
+      .filter((x) => x.overlap > 0);
+    scored.sort((a, b) => {
+      if (b.overlap !== a.overlap) return b.overlap - a.overlap;
+      // prefer primary muscle match listed first on exercise
+      const aPrimary = ids.includes(a.ex.muscles[0]) ? 1 : 0;
+      const bPrimary = ids.includes(b.ex.muscles[0]) ? 1 : 0;
+      if (bPrimary !== aPrimary) return bPrimary - aPrimary;
+      return a.ex.name.localeCompare(b.ex.name, "zh-Hant");
+    });
+    return scored.map((x) => x.ex);
+  }
+
+  function suggestionCardHtml(ex) {
+    const tags = ex.muscles.map((m) => `<span class="tag">${escapeHtml(muscleName(m))}</span>`).join("");
+    const cue = escapeHtml(ex.rightCue || ex.formCue || "");
+    return `
+      <article class="card move-card suggest-card" data-ex="${ex.id}">
+        <div class="card-head">
+          <span class="card-emoji" aria-hidden="true">${ex.emoji}</span>
+          <div>
+            <h3>${escapeHtml(ex.name)}</h3>
+            <p class="muted tiny"><span class="pill ${ex.category}">${catLabel(ex.category)}</span> ${tags}</p>
+          </div>
+        </div>
+        <p class="cue-line muted tiny">✓ ${cue}</p>
+        <div class="btn-row">
+          <button type="button" class="btn primary" data-open-ex="${ex.id}">教學詳情</button>
+          <button type="button" class="btn ghost" data-quick-log="${ex.id}">今日訓練</button>
+        </div>
+      </article>`;
+  }
+
+  function renderGoalSuggestions(targetId, syncInputs) {
+    const box = $(targetId || "#goalResults");
+    if (!box) return;
+    const q = state.goalQuery;
+    const match = matchMuscleIds(q);
+
+    // sync chip active states
+    $$(".goal-chip").forEach((btn) => {
+      const id = btn.dataset.goalChip;
+      let on = false;
+      if (id === "full") on = match.full;
+      else if (match.ids.includes(id) && !match.full) on = true;
+      btn.classList.toggle("active", on);
+    });
+
+    if (syncInputs) {
+      const gi = $("#goalInput");
+      const gim = $("#goalInputMoves");
+      if (gi && gi.value !== q) gi.value = q;
+      if (gim && gim.value !== q) gim.value = q;
+    }
+
+    if (!normalizeGoalQuery(q)) {
+      const emptyHtml = `<div class="goal-empty"><p>試下撳上面部位，或輸入例如「胸」「腿」「二頭」</p></div>`;
+      const main = $("#goalResults");
+      const moves = $("#goalResultsMoves");
+      if (main) {
+        main.hidden = false;
+        main.innerHTML = emptyHtml;
+      }
+      if (moves) {
+        moves.hidden = true;
+        moves.innerHTML = "";
+      }
+      $$(".goal-chip").forEach((btn) => btn.classList.remove("active"));
+      return;
+    }
+
+    let list = [];
+    let tipHtml = "";
+    if (match.full) {
+      list = pickFullBodyMix();
+      tipHtml = `<div class="goal-tips"><p class="coach-tip compact"><strong>全身入門組合：</strong>推、拉、腿、核心各一款，先求動作完整再加量。</p></div>`;
+    } else if (match.unknown || !match.ids.length) {
+      box.hidden = false;
+      box.innerHTML = `<div class="goal-empty"><p>暫時對唔上「${escapeHtml(q)}」。試下撳上面部位，或輸入例如「胸」「腿」「二頭」</p></div>`;
+      return;
+    } else {
+      list = rankExercisesForMuscles(match.ids);
+      tipHtml = match.ids
+        .map((id) => {
+          const m = data.muscles.find((x) => x.id === id);
+          if (!m) return "";
+          return `<p class="coach-tip compact"><span aria-hidden="true">${m.emoji}</span> <strong>${escapeHtml(m.name)} tip：</strong>${escapeHtml(m.tip)}</p>`;
+        })
+        .join("");
+      tipHtml = `<div class="goal-tips">${tipHtml}</div>`;
+    }
+
+    const gym = list.filter((e) => e.category === "gym");
+    const home = list.filter((e) => e.category === "home");
+
+    function section(title, items, emptyMsg) {
+      if (!items.length) {
+        return `<div class="goal-section"><h3 class="section-label">${title}</h3><p class="muted tiny">${emptyMsg}</p></div>`;
+      }
+      return `<div class="goal-section"><h3 class="section-label">${title}</h3><div class="grid">${items.map(suggestionCardHtml).join("")}</div></div>`;
+    }
+
+    box.hidden = false;
+    box.innerHTML =
+      tipHtml +
+      section("健身房儀器", gym, "呢個目標暫時未收錄對應健身房儀器，可睇家用建議。") +
+      section("家用／徒手／啞鈴", home, "呢個目標暫時未收錄家用動作，可睇健身房建議。");
+
+    // also mirror to the other results box if present
+    const other = targetId === "#goalResultsMoves" ? $("#goalResults") : $("#goalResultsMoves");
+    if (other && other !== box) {
+      other.hidden = box.hidden;
+      other.innerHTML = box.innerHTML;
+    }
+  }
+
+  function setGoalQuery(q, opts) {
+    state.goalQuery = q || "";
+    renderGoalSuggestions((opts && opts.target) || "#goalResults", true);
+    if (opts && opts.jumpMuscles) showView("muscles");
+  }
+
+  function renderGoalChips() {
+    const html = GOAL_CHIPS.map(
+      (c) =>
+        `<button type="button" class="goal-chip" data-goal-chip="${c.id}">${escapeHtml(c.label)}</button>`
+    ).join("");
+    const a = $("#goalChips");
+    const b = $("#goalChipsMoves");
+    if (a) a.innerHTML = html;
+    if (b) b.innerHTML = html;
+  }
+
   function renderMuscles() {
     const grid = $("#muscleGrid");
     if (!grid) return;
+    updateHeroCta();
+    renderDailyTip();
     grid.innerHTML = data.muscles
       .map((m) => {
         const moves = (m.moves || []).map(byId).filter(Boolean).slice(0, 4);
@@ -465,18 +717,26 @@
               `<button type="button" class="mini-chip" data-open-ex="${ex.id}">${ex.emoji} ${ex.name}</button>`
           )
           .join("");
+        const tipShort = m.tip.length > 42 ? m.tip.slice(0, 42) + "…" : m.tip;
         return `
-        <article class="card muscle-card" data-muscle="${m.id}">
+        <article class="card muscle-card accent-${m.id}" data-muscle="${m.id}">
           <div class="card-head">
-            <span class="card-emoji" aria-hidden="true">${m.emoji}</span>
+            <span class="card-emoji lg" aria-hidden="true">${m.emoji}</span>
             <div>
-              <h2>${m.name}</h2>
-              <p class="muted tiny">主要：${m.targets}</p>
+              <h2>${escapeHtml(m.name)}</h2>
+              <p class="muted tiny">主要：${escapeHtml(m.targets)}</p>
             </div>
           </div>
-          <p class="coach-tip"><strong>教練提示：</strong>${m.tip}</p>
+          <p class="coach-tip preview"><strong>教練提示：</strong>${escapeHtml(tipShort)}</p>
+          <button type="button" class="btn tip-toggle ghost" data-toggle-tip="${m.id}">睇 tip</button>
+          <div class="tip-full" id="tip-full-${m.id}" hidden>
+            <p class="coach-tip"><strong>教練提示：</strong>${escapeHtml(m.tip)}</p>
+          </div>
           <div class="mini-row">${chips}</div>
-          <button type="button" class="btn ghost block" data-goto-moves="${m.id}">睇呢部位全部動作</button>
+          <div class="btn-row">
+            <button type="button" class="btn primary" data-goal-chip="${m.id}">拎建議</button>
+            <button type="button" class="btn ghost" data-goto-moves="${m.id}">全部動作</button>
+          </div>
         </article>`;
       })
       .join("");
@@ -1031,6 +1291,44 @@
       closeQuickLog();
       return;
     }
+    const jump = ev.target.closest("[data-view-jump]");
+    if (jump) {
+      showView(jump.dataset.viewJump);
+      return;
+    }
+    const tipToggle = ev.target.closest("[data-toggle-tip]");
+    if (tipToggle) {
+      const id = tipToggle.dataset.toggleTip;
+      const full = $("#tip-full-" + id);
+      const card = tipToggle.closest(".muscle-card");
+      if (full) {
+        const open = full.hidden;
+        full.hidden = !open;
+        tipToggle.textContent = open ? "收起 tip" : "睇 tip";
+        if (card) {
+          const preview = card.querySelector(".coach-tip.preview");
+          if (preview) preview.hidden = open;
+        }
+      }
+      return;
+    }
+    const goalChip = ev.target.closest("[data-goal-chip]");
+    if (goalChip) {
+      const id = goalChip.dataset.goalChip;
+      const label = id === "full" ? "全身" : ((data.muscles.find((x) => x.id === id) || {}).name || id);
+      state.goalQuery = label;
+      const onMoves = state.view === "moves";
+      if (!onMoves && state.view !== "muscles") showView("muscles");
+      const target = onMoves ? "#goalResultsMoves" : "#goalResults";
+      renderGoalSuggestions(target, true);
+      const box = $(target);
+      if (box) box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      return;
+    }
+    if (ev.target.id === "dailyTipNext") {
+      nextDailyTip();
+      return;
+    }
     if (ev.target.id === "clearLogFilters") {
       state.logFilterDate = "";
       state.logFilterMuscle = "";
@@ -1053,8 +1351,34 @@
     }
   }
 
+  function bindGoalSearch() {
+    renderGoalChips();
+    const pool = tipPool();
+    const daySeed = new Date().getDate() + new Date().getMonth() * 31;
+    state.tipIndex = pool.length ? daySeed % pool.length : 0;
+    renderDailyTip();
+
+    function onGoalInput(ev, target) {
+      setGoalQuery(ev.target.value, { target: target });
+    }
+    const gi = $("#goalInput");
+    if (gi) {
+      gi.addEventListener("input", (e) => onGoalInput(e, "#goalResults"));
+    }
+    const gim = $("#goalInputMoves");
+    if (gim) {
+      gim.addEventListener("input", (e) => {
+        state.goalQuery = e.target.value;
+        renderGoalSuggestions("#goalResultsMoves", true);
+      });
+    }
+    // empty state hint once
+    renderGoalSuggestions("#goalResults", false);
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     bindFilters();
+    bindGoalSearch();
     document.addEventListener("click", onClick);
     const form = $("#logForm");
     if (form) form.addEventListener("submit", submitQuickLog);

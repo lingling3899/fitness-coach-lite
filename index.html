@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="description" content="健身教練 Lite：按部位教學、健身房／家用動作、21 日短片式圖解挑戰、本機註冊／登入同個人訓練記錄。示意非醫療，請咨詢專業教練。" />
+  <meta name="description" content="健身教練 Lite：輸入想增肌部位即時建議儀器／動作、每日小 tips、部位教學、短片圖解、本機註冊記進度。示意非醫療，請咨詢專業教練。" />
   <meta name="theme-color" content="#0f1419" />
-  <title>健身教練 Lite · 部位／動作／短片教學／註冊登入／訓練記錄</title>
-  <link rel="stylesheet" href="assets/css/app.css?v=20261028g" />
+  <title>健身教練 Lite · 目標部位建議／小 tips／短片／註冊記進度</title>
+  <link rel="stylesheet" href="assets/css/app.css?v=20261028h" />
 </head>
 <body>
   <header class="topbar">
@@ -36,9 +36,35 @@
   <main class="wrap">
     <!-- 部位教學 -->
     <section id="view-muscles" class="view active" aria-labelledby="muscles-title">
-      <div class="panel">
-        <h2 id="muscles-title">教練按部位帶路</h2>
-        <p class="lead">揀胸／背／肩／手臂／腿／核心，睇短提示同推薦動作。再入「儀器／動作」或「短片教學」睇步驟同圖解。</p>
+      <div class="panel welcome-hero" id="welcomeHero">
+        <div class="hero-glow" aria-hidden="true"></div>
+        <p class="hero-kicker">今日練邊度？</p>
+        <h2 id="muscles-title">想增肌 · 即時建議儀器同動作</h2>
+        <p class="lead hero-lead">今日想練邊度？登入記進度，跟住小 tips 練得穩陣啲。撳下面部位，或自己輸入例如「胸」「腿」「二頭」。</p>
+        <div class="hero-cta-row" id="heroCtaRow">
+          <button type="button" class="btn primary" data-open-auth data-auth-tab="register">註冊／登入</button>
+          <button type="button" class="btn ghost" data-view-jump="shorts">睇短片教學</button>
+        </div>
+        <div class="goal-box">
+          <label class="field" for="goalInput">想增肌／加強邊個部位？</label>
+          <input type="search" id="goalInput" placeholder="例如：胸、腿、二頭、腹肌、全身…" autocomplete="off" enterkeyhint="search" />
+          <div class="goal-chips" id="goalChips" role="group" aria-label="快速部位"></div>
+        </div>
+      </div>
+
+      <div class="tip-strip" id="dailyTipStrip" aria-live="polite">
+        <div class="tip-strip-inner">
+          <span class="tip-badge">今日小 tip</span>
+          <p class="tip-text" id="dailyTipText"></p>
+          <button type="button" class="tip-next" id="dailyTipNext" aria-label="下一則 tip">換一則</button>
+        </div>
+      </div>
+
+      <div id="goalResults" class="goal-results" hidden aria-live="polite"></div>
+
+      <div class="panel soft-panel">
+        <h3 class="section-label">部位教學卡</h3>
+        <p class="lead compact">撳卡睇 tip，或用上面搜尋即時拎建議。</p>
       </div>
       <div id="muscleGrid" class="grid" aria-live="polite"></div>
     </section>
@@ -47,7 +73,13 @@
     <section id="view-moves" class="view" aria-labelledby="moves-title">
       <div class="panel">
         <h2 id="moves-title">儀器／動作一覽</h2>
-        <p class="lead">健身房器械同家用徒手／啞鈴精簡收錄。撳「教學詳情」睇步驟；「今日訓練」寫入本機記錄。</p>
+        <p class="lead">健身房器械同家用徒手／啞鈴精簡收錄。撳「教學詳情」睇步驟；「今日訓練」寫入本機記錄。亦可喺「部位教學」輸入想增肌部位即時拎建議。</p>
+        <div class="goal-box mini">
+          <label class="field" for="goalInputMoves">快速目標搜尋</label>
+          <input type="search" id="goalInputMoves" placeholder="輸入部位，例如胸／背／腿…" autocomplete="off" />
+          <div class="goal-chips" id="goalChipsMoves" role="group" aria-label="快速部位"></div>
+        </div>
+        <div id="goalResultsMoves" class="goal-results compact" hidden aria-live="polite"></div>
         <div class="filters">
           <div>
             <label class="field" for="categoryFilter">類別</label>
@@ -124,10 +156,12 @@
     <section id="view-about" class="view" aria-labelledby="about-title">
       <div class="panel">
         <h2 id="about-title">關於健身教練 Lite</h2>
-        <p class="lead">靜態精簡版：部位教練提示、健身房／家用動作教學、21 日短片式圖解挑戰、本機註冊／登入同個人訓練日誌。適合快速查同記，唔取代真人教練。</p>
+        <p class="lead">靜態精簡版：輸入想增肌部位即時建議儀器／動作、每日小 tips、部位教練提示、健身房／家用動作教學、21 日短片式圖解挑戰、本機註冊／登入同個人訓練日誌。適合快速查同記，唔取代真人教練。</p>
         <p id="aboutStats" class="count"></p>
         <ul class="about-list">
-          <li><strong>部位教學</strong>：胸、背、肩、手臂、腿、核心 — 短提示＋推薦動作。</li>
+          <li><strong>目標搜尋</strong>：輸入或撳胸／背／肩／手臂／腿／核心／臀／全身，即時分「健身房儀器」同「家用／徒手／啞鈴」建議。</li>
+          <li><strong>今日小 tips</strong>：熱身、呼吸、溫柔進階、恢復等短提示（示意，非醫療）。</li>
+          <li><strong>部位教學</strong>：胸、背、肩、手臂、腿、臀、核心 — 短提示＋推薦動作。</li>
           <li><strong>儀器／動作</strong>：健身房常見器械同家用徒手／啞鈴各精簡數款；含步驟、常見錯誤、新手組數參考。</li>
           <li><strong>短片教學</strong>：21 日挑戰卡網格、錯誤／正確姿勢示意、肌群高亮 SVG。<strong>而家內建 18 款解剖圖解示意短片</strong>（伏地挺身、徒手深蹲、平板撑、高位下拉、蝴蝶夾胸、臀橋、啞鈴划船、啞鈴肩推、啞鈴彎舉、腿舉機、史密斯深蹲、弓步蹲、坐姿划船、繩索面拉、繩索三頭下壓、史密斯推胸、肩推機、啞鈴胸推；非真人）；其餘可自備 YouTube 連結（本機儲存）。版面為示意圖解，非抄襲他牌。</li>
           <li><strong>註冊／登入</strong>：本機多帳戶（瀏覽器 localStorage），每人自己一套訓練日誌；唔上雲、唔同步其他裝置。</li>
@@ -140,7 +174,7 @@
       </div>
       <div class="panel">
         <h3>版本</h3>
-        <p class="muted tiny">fitness-coach-lite · ?v=20261028g · GitHub Pages</p>
+        <p class="muted tiny">fitness-coach-lite · ?v=20261028h · GitHub Pages</p>
       </div>
     </section>
   </main>
@@ -202,8 +236,8 @@
     <div class="modal-card auth-card" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
       <div class="log-top">
         <div>
-          <h2 id="authModalTitle">帳戶</h2>
-          <p class="muted tiny">本機帳戶 · 資料只存此裝置，唔上雲</p>
+          <h2 id="authModalTitle">歡迎加入</h2>
+          <p class="muted tiny auth-invite">30 秒開帳戶，訓練記錄只屬於你 · 本機儲存，唔上雲</p>
         </div>
         <button type="button" class="icon-btn" data-close-auth aria-label="關閉">✕</button>
       </div>
@@ -245,13 +279,13 @@
           </div>
         </div>
         <p class="auth-error" id="regError" hidden></p>
-        <button type="submit" class="btn primary block">註冊並登入</button>
+        <button type="submit" class="btn primary block">開帳戶並開始記進度</button>
       </form>
     </div>
   </div>
 
-  <script src="assets/js/data.js?v=20261028g"></script>
-  <script src="assets/js/anatomy.js?v=20261028g"></script>
-  <script src="assets/js/app.js?v=20261028g"></script>
+  <script src="assets/js/data.js?v=20261028h"></script>
+  <script src="assets/js/anatomy.js?v=20261028h"></script>
+  <script src="assets/js/app.js?v=20261028h"></script>
 </body>
 </html>
