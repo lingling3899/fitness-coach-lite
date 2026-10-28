@@ -6,7 +6,7 @@
   const VIDEO_KEY = "fitnessCoachLite.videos.v1";
   const USERS_KEY = "fitnessCoachLite.users.v1";
   const SESSION_KEY = "fitnessCoachLite.session.v1";
-  const CACHE = "20261028k";
+  const CACHE = "20261029a";
   const BUNDLED_VIDEOS = {
     "db-row": { src: "assets/videos/db-row.mp4", poster: "assets/videos/db-row.jpg" },
     "db-shoulder-press": { src: "assets/videos/db-shoulder-press.mp4", poster: "assets/videos/db-shoulder-press.jpg" },
@@ -977,10 +977,9 @@
     // When from shorts, title is in banner; still need id for a11y
     const titleHidden = fromShorts ? `<h2 id="detailTitle" class="visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">${escapeHtml(ex.name)}</h2>` : "";
 
-    body.innerHTML = `
-      ${titleHidden}
-      ${fromShorts ? shortsBlocks : basicHero}
-      ${!fromShorts ? `
+    const visuals = fromShorts
+      ? shortsBlocks
+      : `${basicHero}
       <div class="form-split" aria-label="錯誤與正確對比">
         <div class="form-panel wrong">
           <span class="form-badge" aria-label="錯誤">✕</span>
@@ -992,7 +991,10 @@
           <div class="form-fig">${forms.right}</div>
           <div class="form-cue">${escapeHtml(rightCue)}</div>
         </div>
-      </div>` : ""}
+      </div>
+      ${videoSlotHtml(ex)}`;
+
+    const copyBlocks = `
       <section class="detail-block">
         <h3>步驟</h3>
         <ol class="step-list">${steps}</ol>
@@ -1003,15 +1005,21 @@
       </section>
       <section class="detail-block">
         <h3>建議組數（新手參考）</h3>
-        <p>${ex.prescription}</p>
+        <p class="rx-body">${ex.prescription}</p>
       </section>
       <section class="detail-block">
         <h3>安全提示</h3>
-        <p>${ex.safety}</p>
+        <p class="rx-body">${ex.safety}</p>
       </section>
-      ${!fromShorts ? videoSlotHtml(ex) : ""}
       <button type="button" class="btn primary block" data-quick-log="${ex.id}">加入今日訓練記錄</button>
-      <p class="muted tiny center">示意教學 · 非醫療建議 · 請咨詢專業教練</p>
+      <p class="muted tiny center">示意教學 · 非醫療建議 · 請咨詢專業教練</p>`;
+
+    body.innerHTML = `
+      ${titleHidden}
+      <div class="detail-layout">
+        <div class="detail-visuals">${visuals}</div>
+        <div class="detail-copy">${copyBlocks}</div>
+      </div>
     `;
     panel.classList.add("open");
     panel.setAttribute("aria-hidden", "false");
