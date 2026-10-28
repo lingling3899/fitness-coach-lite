@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "fitnessCoachLite.logs.v1";
   const VIDEO_KEY = "fitnessCoachLite.videos.v1";
-  const CACHE = "20261028d";
+  const CACHE = "20261028e";
   const BUNDLED_VIDEOS = {
     "db-row": { src: "assets/videos/db-row.mp4", poster: "assets/videos/db-row.jpg" },
     "db-shoulder-press": { src: "assets/videos/db-shoulder-press.mp4", poster: "assets/videos/db-shoulder-press.jpg" },
@@ -14,7 +14,13 @@
     "plank": { src: "assets/videos/plank.mp4", poster: "assets/videos/plank.jpg" },
     "lat-pulldown": { src: "assets/videos/lat-pulldown.mp4", poster: "assets/videos/lat-pulldown.jpg" },
     "pec-deck": { src: "assets/videos/pec-deck.mp4", poster: "assets/videos/pec-deck.jpg" },
-    "glute-bridge": { src: "assets/videos/glute-bridge.mp4", poster: "assets/videos/glute-bridge.jpg" }
+    "glute-bridge": { src: "assets/videos/glute-bridge.mp4", poster: "assets/videos/glute-bridge.jpg" },
+    "leg-press": { src: "assets/videos/leg-press.mp4", poster: "assets/videos/leg-press.jpg" },
+    "smith-squat": { src: "assets/videos/smith-squat.mp4", poster: "assets/videos/smith-squat.jpg" },
+    "lunge": { src: "assets/videos/lunge.mp4", poster: "assets/videos/lunge.jpg" },
+    "seated-row": { src: "assets/videos/seated-row.mp4", poster: "assets/videos/seated-row.jpg" },
+    "face-pull": { src: "assets/videos/face-pull.mp4", poster: "assets/videos/face-pull.jpg" },
+    "triceps-pushdown": { src: "assets/videos/triceps-pushdown.mp4", poster: "assets/videos/triceps-pushdown.jpg" }
   };
   const data = window.FITNESS_DATA;
   const anatomy = window.FITNESS_ANATOMY;
@@ -110,7 +116,7 @@
         </div>`
       : `<div class="video-placeholder">
           <strong>未有內建短片</strong>
-          <span>可自備 YouTube／短片網址（本機儲存）。而家內建 9 款解剖圖解示意短片。</span>
+          <span>可自備 YouTube／短片網址（本機儲存）。而家內建 15 款解剖圖解示意短片。</span>
         </div>`;
     return `
       <section class="video-slot">
