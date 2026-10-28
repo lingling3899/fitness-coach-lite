@@ -4,11 +4,17 @@
 
   const STORAGE_KEY = "fitnessCoachLite.logs.v1";
   const VIDEO_KEY = "fitnessCoachLite.videos.v1";
-  const CACHE = "20261028c";
+  const CACHE = "20261028d";
   const BUNDLED_VIDEOS = {
     "db-row": { src: "assets/videos/db-row.mp4", poster: "assets/videos/db-row.jpg" },
     "db-shoulder-press": { src: "assets/videos/db-shoulder-press.mp4", poster: "assets/videos/db-shoulder-press.jpg" },
-    "db-curl": { src: "assets/videos/db-curl.mp4", poster: "assets/videos/db-curl.jpg" }
+    "db-curl": { src: "assets/videos/db-curl.mp4", poster: "assets/videos/db-curl.jpg" },
+    "pushup": { src: "assets/videos/pushup.mp4", poster: "assets/videos/pushup.jpg" },
+    "bw-squat": { src: "assets/videos/bw-squat.mp4", poster: "assets/videos/bw-squat.jpg" },
+    "plank": { src: "assets/videos/plank.mp4", poster: "assets/videos/plank.jpg" },
+    "lat-pulldown": { src: "assets/videos/lat-pulldown.mp4", poster: "assets/videos/lat-pulldown.jpg" },
+    "pec-deck": { src: "assets/videos/pec-deck.mp4", poster: "assets/videos/pec-deck.jpg" },
+    "glute-bridge": { src: "assets/videos/glute-bridge.mp4", poster: "assets/videos/glute-bridge.jpg" }
   };
   const data = window.FITNESS_DATA;
   const anatomy = window.FITNESS_ANATOMY;
@@ -104,7 +110,7 @@
         </div>`
       : `<div class="video-placeholder">
           <strong>未有內建短片</strong>
-          <span>可自備 YouTube／短片網址（本機儲存）。已內建 3 款：啞鈴划船、啞鈴肩推、啞鈴彎舉。</span>
+          <span>可自備 YouTube／短片網址（本機儲存）。而家內建 9 款解剖圖解示意短片。</span>
         </div>`;
     return `
       <section class="video-slot">
