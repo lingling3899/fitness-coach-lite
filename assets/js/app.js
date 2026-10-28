@@ -6,7 +6,7 @@
   const VIDEO_KEY = "fitnessCoachLite.videos.v1";
   const USERS_KEY = "fitnessCoachLite.users.v1";
   const SESSION_KEY = "fitnessCoachLite.session.v1";
-  const CACHE = "20261028j";
+  const CACHE = "20261028k";
   const BUNDLED_VIDEOS = {
     "db-row": { src: "assets/videos/db-row.mp4", poster: "assets/videos/db-row.jpg" },
     "db-shoulder-press": { src: "assets/videos/db-shoulder-press.mp4", poster: "assets/videos/db-shoulder-press.jpg" },
@@ -28,7 +28,21 @@
     "dumbbell-press-home": { src: "assets/videos/dumbbell-press-home.mp4", poster: "assets/videos/dumbbell-press-home.jpg" },
     "dual-pedal-press": { src: "assets/videos/dual-pedal-press.mp4", poster: "assets/videos/dual-pedal-press.jpg" },
     "leg-extension": { src: "assets/videos/leg-extension.mp4", poster: "assets/videos/leg-extension.jpg" },
-    "chest-press-machine": { src: "assets/videos/chest-press-machine.mp4", poster: "assets/videos/chest-press-machine.jpg" }
+    "chest-press-machine": { src: "assets/videos/chest-press-machine.mp4", poster: "assets/videos/chest-press-machine.jpg" },
+    "hack-squat": { src: "assets/videos/hack-squat.mp4", poster: "assets/videos/hack-squat.jpg" },
+    "vertical-leg-press": { src: "assets/videos/vertical-leg-press.mp4", poster: "assets/videos/vertical-leg-press.jpg" },
+    "leg-curl": { src: "assets/videos/leg-curl.mp4", poster: "assets/videos/leg-curl.jpg" },
+    "hanging-leg-raise": { src: "assets/videos/hanging-leg-raise.mp4", poster: "assets/videos/hanging-leg-raise.jpg" },
+    "ab-crunch-machine": { src: "assets/videos/ab-crunch-machine.mp4", poster: "assets/videos/ab-crunch-machine.jpg" },
+    "lateral-raise-machine": { src: "assets/videos/lateral-raise-machine.mp4", poster: "assets/videos/lateral-raise-machine.jpg" },
+    "assisted-pullup": { src: "assets/videos/assisted-pullup.mp4", poster: "assets/videos/assisted-pullup.jpg" },
+    "straight-arm-pulldown": { src: "assets/videos/straight-arm-pulldown.mp4", poster: "assets/videos/straight-arm-pulldown.jpg" },
+    "incline-chest-press": { src: "assets/videos/incline-chest-press.mp4", poster: "assets/videos/incline-chest-press.jpg" },
+    "treadmill": { src: "assets/videos/treadmill.mp4", poster: "assets/videos/treadmill.jpg" },
+    "elliptical": { src: "assets/videos/elliptical.mp4", poster: "assets/videos/elliptical.jpg" },
+    "upright-bike": { src: "assets/videos/upright-bike.mp4", poster: "assets/videos/upright-bike.jpg" },
+    "recumbent-bike": { src: "assets/videos/recumbent-bike.mp4", poster: "assets/videos/recumbent-bike.jpg" },
+    "stair-climber": { src: "assets/videos/stair-climber.mp4", poster: "assets/videos/stair-climber.jpg" }
   };
   const data = window.FITNESS_DATA;
   const anatomy = window.FITNESS_ANATOMY;
@@ -63,14 +77,16 @@
     { id: "legs", label: "腿" },
     { id: "core", label: "核心" },
     { id: "glutes", label: "臀" },
+    { id: "cardio", label: "有氧" },
     { id: "full", label: "全身" }
   ];
 
   const FULL_BODY_PICKS = {
-    push: ["pushup", "smith-bench", "chest-press-machine", "dumbbell-press-home"],
-    pull: ["seated-row", "db-row", "lat-pulldown"],
-    legs: ["bw-squat", "smith-squat", "leg-press", "dual-pedal-press", "leg-extension"],
-    core: ["plank", "glute-bridge"]
+    push: ["pushup", "smith-bench", "chest-press-machine", "incline-chest-press", "dumbbell-press-home"],
+    pull: ["seated-row", "db-row", "lat-pulldown", "assisted-pullup", "straight-arm-pulldown"],
+    legs: ["bw-squat", "smith-squat", "hack-squat", "leg-press", "vertical-leg-press", "dual-pedal-press", "leg-extension", "leg-curl"],
+    core: ["plank", "hanging-leg-raise", "ab-crunch-machine", "glute-bridge"],
+    cardio: ["treadmill", "elliptical", "upright-bike"]
   };
 
   function byId(id) {
@@ -83,7 +99,9 @@
   }
 
   function catLabel(c) {
-    return c === "gym" ? "健身房" : "家用";
+    if (c === "gym") return "健身房";
+    if (c === "cardio") return "有氧";
+    return "家用";
   }
 
   /* —— Auth (local multi-account) —— */
@@ -424,7 +442,7 @@
         </div>`
       : `<div class="video-placeholder">
           <strong>未有內建短片</strong>
-          <span>可自備 YouTube／短片網址（本機儲存）。而家內建 21 款解剖圖解示意短片。</span>
+          <span>可自備 YouTube／短片網址（本機儲存）。而家內建 35 款解剖圖解示意短片。</span>
         </div>`;
     return `
       <section class="video-slot">
@@ -668,6 +686,7 @@
     }
 
     const gym = list.filter((e) => e.category === "gym");
+    const cardio = list.filter((e) => e.category === "cardio");
     const home = list.filter((e) => e.category === "home");
 
     function section(title, items, emptyMsg) {
@@ -680,8 +699,9 @@
     box.hidden = false;
     box.innerHTML =
       tipHtml +
-      section("健身房儀器", gym, "呢個目標暫時未收錄對應健身房儀器，可睇家用建議。") +
-      section("家用／徒手／啞鈴", home, "呢個目標暫時未收錄家用動作，可睇健身房建議。");
+      section("健身房儀器", gym, "呢個目標暫時未收錄對應健身房儀器，可睇其他建議。") +
+      section("有氧器械", cardio, "呢個目標暫時未收錄有氧器械。") +
+      section("家用／徒手／啞鈴", home, "呢個目標暫時未收錄家用動作，可睇其他建議。");
 
     // also mirror to the other results box if present
     const other = targetId === "#goalResultsMoves" ? $("#goalResults") : $("#goalResultsMoves");
@@ -820,7 +840,7 @@
         })
         .filter(Boolean);
     }
-    // 全部圖解：21 款有海報嘅動作（BUNDLED_VIDEOS 順序）
+    // 全部圖解：有海報嘅動作（BUNDLED_VIDEOS 順序）
     const ids = Object.keys(BUNDLED_VIDEOS);
     let n = 0;
     return ids
@@ -862,9 +882,11 @@
       const catLabelText =
         state.catalogCategory === "gym"
           ? " · 健身房"
-          : state.catalogCategory === "home"
-            ? " · 家用"
-            : "";
+          : state.catalogCategory === "cardio"
+            ? " · 有氧"
+            : state.catalogCategory === "home"
+              ? " · 家用"
+              : "";
       countEl.textContent = modeLabel + catLabelText + " · " + entries.length + " 款";
     }
     if (!entries.length) {
@@ -1228,6 +1250,7 @@
       cat.innerHTML =
         `<option value="">全部類別</option>` +
         `<option value="gym">健身房器械</option>` +
+        `<option value="cardio">有氧器械</option>` +
         `<option value="home">家用／徒手／啞鈴</option>`;
       cat.addEventListener("change", () => {
         state.categoryFilter = cat.value;
@@ -1424,12 +1447,13 @@
 
   function initStats() {
     const gym = data.exercises.filter((e) => e.category === "gym").length;
+    const cardio = data.exercises.filter((e) => e.category === "cardio").length;
     const home = data.exercises.filter((e) => e.category === "home").length;
     const days = (data.challenge && data.challenge.days && data.challenge.days.length) || 0;
     const el = $("#aboutStats");
     if (el) {
       const vids = Object.keys(BUNDLED_VIDEOS).length;
-      el.textContent = `而家收錄：健身房器械 ${gym} 款 · 家用／徒手／啞鈴 ${home} 款 · 部位 ${data.muscles.length} 個 · 挑戰 ${days} 日 · 內建解剖短片 ${vids} 款`;
+      el.textContent = `而家收錄：健身房器械 ${gym} 款 · 有氧 ${cardio} 款 · 家用／徒手／啞鈴 ${home} 款 · 部位 ${data.muscles.length} 個 · 挑戰 ${days} 日 · 內建解剖短片 ${vids} 款`;
     }
   }
 

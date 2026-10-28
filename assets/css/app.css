@@ -289,6 +289,7 @@ textarea { min-height: 88px; resize: vertical; }
 }
 .pill.gym { background: rgba(91, 140, 255, 0.18); color: #9bbcff; }
 .pill.home { background: rgba(61, 220, 151, 0.16); color: #7aefbf; }
+.pill.cardio { background: rgba(255, 120, 160, 0.16); color: #ff9aba; }
 .tag {
   display: inline-block;
   margin-left: 4px;
@@ -1305,6 +1306,7 @@ body.detail-open #detailBackdrop {
 .muscle-card.accent-legs { --card-accent: #9b7bff; }
 .muscle-card.accent-glutes { --card-accent: #ff9f6b; }
 .muscle-card.accent-core { --card-accent: #ff6b6b; }
+.muscle-card.accent-cardio { --card-accent: #ff7aa2; }
 .muscle-card[class*="accent-"] {
   background:
     linear-gradient(var(--bg-card), var(--bg-card)) padding-box,

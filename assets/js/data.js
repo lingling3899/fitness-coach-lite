@@ -7,8 +7,8 @@ window.FITNESS_DATA = {
       emoji: "💪",
       tip: "練胸要留意肩胛微微後夾、唔好聳肩。推嘅時候呼氣，控制下放。新手先學伏地挺身同胸推機，再加蝴蝶夾胸。",
       targets: "胸大肌、前三角肌、三頭肌（輔助）",
-      aliases: ["胸", "胸部", "胸肌", "上胸", "下胸", "增肌胸", "pecs", "chest", "推胸", "推胸機", "坐姿推胸"],
-      moves: ["pushup", "smith-bench", "chest-press-machine", "pec-deck", "dumbbell-press-home"]
+      aliases: ["胸", "胸部", "胸肌", "上胸", "下胸", "增肌胸", "pecs", "chest", "推胸", "推胸機", "坐姿推胸", "上斜推胸"],
+      moves: ["pushup", "smith-bench", "chest-press-machine", "incline-chest-press", "pec-deck", "dumbbell-press-home"]
     },
     {
       id: "back",
@@ -16,8 +16,8 @@ window.FITNESS_DATA = {
       emoji: "🫁",
       tip: "練背重點係「拉到肩胛骨郁」，唔係淨係手臂用力。坐姿划船同啞鈴划船最易學到感覺；高位下拉注意唔好過度後仰。",
       targets: "闊背肌、中下斜方、菱形肌、二頭（輔助）",
-      aliases: ["背", "背部", "後背", "闊背", "背肌", "增肌背", "back", "lats"],
-      moves: ["seated-row", "lat-pulldown", "db-row", "face-pull"]
+      aliases: ["背", "背部", "後背", "闊背", "背肌", "增肌背", "back", "lats", "引體", "直臂下壓"],
+      moves: ["seated-row", "lat-pulldown", "assisted-pullup", "straight-arm-pulldown", "db-row", "face-pull"]
     },
     {
       id: "shoulders",
@@ -25,8 +25,8 @@ window.FITNESS_DATA = {
       emoji: "🏋️",
       tip: "肩關節較脆弱，重量由輕開始。肩推時手肘唔好過度外開；面拉有助後三角同肩胛穩定，建議每週加一兩組。",
       targets: "前／中／後三角肌、斜方上部（輔助）",
-      aliases: ["肩", "肩膀", "三角肌", "肩推", "增肌肩", "shoulders", "delts"],
-      moves: ["shoulder-press-machine", "db-shoulder-press", "face-pull"]
+      aliases: ["肩", "肩膀", "三角肌", "肩推", "增肌肩", "shoulders", "delts", "側平舉", "飛鳥"],
+      moves: ["shoulder-press-machine", "lateral-raise-machine", "db-shoulder-press", "face-pull"]
     },
     {
       id: "arms",
@@ -43,8 +43,8 @@ window.FITNESS_DATA = {
       emoji: "🦵",
       tip: "下肢係全身力量基礎。深蹲同腿舉注意膝蓋對準腳尖方向，腰背保持自然中立。家用可用徒手深蹲、弓步、臀橋起步。",
       targets: "股四頭、腘繩肌、臀大肌、小腿（輔助）",
-      aliases: ["腿", "下肢", "大腿", "小腿", "股四", "增肌腿", "legs", "quads", "hamstrings", "蹬腿", "踏板", "腿伸展", "伸膝"],
-      moves: ["smith-squat", "leg-press", "dual-pedal-press", "leg-extension", "bw-squat", "lunge", "glute-bridge"]
+      aliases: ["腿", "下肢", "大腿", "小腿", "股四", "增肌腿", "legs", "quads", "hamstrings", "蹬腿", "踏板", "腿伸展", "伸膝", "哈克", "腿彎曲", "腘繩", "垂直腿舉"],
+      moves: ["smith-squat", "hack-squat", "leg-press", "vertical-leg-press", "dual-pedal-press", "leg-extension", "leg-curl", "bw-squat", "lunge", "glute-bridge"]
     },
     {
       id: "glutes",
@@ -53,7 +53,7 @@ window.FITNESS_DATA = {
       tip: "練臀重點係髖鉸鏈同頂端夾臀，唔好淨係用腰拱起代替。臀橋、弓步、深蹲都有助臀部發力；控制下放效果更好。",
       targets: "臀大肌、臀中肌（穩定）、腘繩肌（輔助）",
       aliases: ["臀", "臀部", "屁股", "翹臀", "臀肌", "glutes", "glute"],
-      moves: ["glute-bridge", "lunge", "bw-squat", "smith-squat", "leg-press", "dual-pedal-press"]
+      moves: ["glute-bridge", "lunge", "bw-squat", "smith-squat", "hack-squat", "leg-press", "vertical-leg-press", "dual-pedal-press", "stair-climber"]
     },
     {
       id: "core",
@@ -61,8 +61,17 @@ window.FITNESS_DATA = {
       emoji: "🔥",
       tip: "核心唔止係腹肌，仲包括穩定腰椎同骨盆。平板撑先求時間同姿勢，再進階；呼吸要順，唔好閉氣用力。",
       targets: "腹直肌、腹橫肌、斜腹、豎脊肌（穩定）",
-      aliases: ["核心", "腹肌", "腹", "腰腹", "中軸", "core", "abs", "腹部"],
-      moves: ["plank", "glute-bridge", "bw-squat"]
+      aliases: ["核心", "腹肌", "腹", "腰腹", "中軸", "core", "abs", "腹部", "抬腿", "捲腹"],
+      moves: ["plank", "hanging-leg-raise", "ab-crunch-machine", "glute-bridge", "bw-squat"]
+    },
+    {
+      id: "cardio",
+      name: "有氧",
+      emoji: "❤️",
+      tip: "有氧以能對話嘅輕至中等強度起步，逐步加時間。姿勢保持直立、唔聳肩；踏板／腳踏全程腳掌穩。示意教學，唔係醫療心肺評估。",
+      targets: "心肺耐力、下肢（輔助）",
+      aliases: ["有氧", "心肺", "跑步", "單車", "橢圓", "樓梯機", "跑步機", "cardio", "有氧器械", "燃脂"],
+      moves: ["treadmill", "elliptical", "upright-bike", "recumbent-bike", "stair-climber"]
     }
   ],
 
@@ -312,6 +321,288 @@ window.FITNESS_DATA = {
       safety: "獨立手把可單邊練；肩有舊患先咨詢專業人士，重量循序。示意教學，非醫療建議。"
     },
 
+
+    {
+      id: "hack-squat",
+      name: "哈克深蹲機",
+      category: "gym",
+      muscles: ["legs", "glutes"],
+      formCue: "knee",
+      wrongCue: "膝內扣、腰離墊",
+      rightCue: "背貼墊、膝跟腳尖",
+      muscleBadge: "腿臀",
+      emoji: "🦿",
+      steps: [
+        "背貼斜墊，雙肩頂住肩墊；雙腳置踏板約肩寬、中位。",
+        "解鎖安全扣，吸氣緩慢屈膝下蹲至舒適深度。",
+        "膝蓋跟腳尖方向一致，腰背保持貼墊。",
+        "腳跟蹬地站起呼氣，頂端唔鎖死膝蓋。"
+      ],
+      mistakes: ["膝蓋內扣", "腰離開靠墊", "腳跟離地", "下放失控"],
+      prescription: "新手 3 組 × 8–12 次",
+      safety: "軌跡固定，深度以腰能貼住為準；重量循序。示意教學，非醫療建議。"
+    },
+    {
+      id: "vertical-leg-press",
+      name: "垂直腿舉",
+      category: "gym",
+      muscles: ["legs", "glutes"],
+      formCue: "knee",
+      wrongCue: "腰拱離墊、膝內扣",
+      rightCue: "腰貼墊、控速蹬",
+      muscleBadge: "腿",
+      emoji: "⬆️",
+      steps: [
+        "仰臥穩坐，背貼靠墊；雙腳置垂直踏板約肩寬。",
+        "雙手可握側把手；解鎖後緩慢屈膝下放。",
+        "至舒適深度（腰唔離墊），呼氣腳跟蹬回。",
+        "頂端唔鎖死膝，全程核心輕收。"
+      ],
+      mistakes: ["腰過度拱起離墊", "膝蓋內扣", "鎖死膝蓋猛蹬", "下放太深失控"],
+      prescription: "新手 3 組 × 10–15 次",
+      safety: "垂直軌跡負荷感較大，先輕重量；髖或腰不適即减幅度。示意非醫療。"
+    },
+    {
+      id: "leg-curl",
+      name: "腿彎曲機",
+      category: "gym",
+      muscles: ["legs", "glutes"],
+      formCue: "knee",
+      wrongCue: "借衝力甩起、臀抬離",
+      rightCue: "控速屈膝、髖貼墊",
+      muscleBadge: "腘繩",
+      emoji: "🦵",
+      steps: [
+        "按機型俯臥或坐姿；膝關節對準機軸，腳踝抵滾墊。",
+        "可雙腳一齊，或者左右單邊（機型允許時）。",
+        "呼氣屈膝將滾墊向臀部方向拉起，頂端輕停。",
+        "吸氣控制伸直還原，髖部貼穩唔借甩。"
+      ],
+      mistakes: ["用衝力甩起", "臀部抬離墊面", "重量過重致膝後扯", "還原失控"],
+      prescription: "新手 3 組 × 10–15 次（單邊則每側 8–12 次）",
+      safety: "腘繩／膝後不適即减重；掛片式北歐挺屬進階變化，新手先以機器控軌跡為主。示意非醫療。"
+    },
+    {
+      id: "hanging-leg-raise",
+      name: "抬腿訓練器",
+      category: "gym",
+      muscles: ["core"],
+      formCue: "spine",
+      wrongCue: "猛甩腿、靠慣性",
+      rightCue: "收腹控速抬膝",
+      muscleBadge: "腹",
+      emoji: "🔼",
+      steps: [
+        "前臂置臂托，背貼靠墊，身體懸垂穩定。",
+        "核心收緊，呼氣將雙膝向胸口方向提起。",
+        "頂端輕停，感受腹肌發力，唔靠慣性甩。",
+        "吸氣控制下放至雙腿伸展但仍有張力。"
+      ],
+      mistakes: ["前後大幅甩盪", "只用髖屈肌猛踢", "聳肩離墊", "憋氣"],
+      prescription: "新手 3 組 × 8–12 次",
+      safety: "肩或下背不適可改屈膝小幅度；進階可直腿抬。示意教學，非醫療建議。"
+    },
+    {
+      id: "ab-crunch-machine",
+      name: "腹肌訓練機",
+      category: "gym",
+      muscles: ["core"],
+      formCue: "spine",
+      wrongCue: "用頸拉、甩衝力",
+      rightCue: "腹發力捲軀幹",
+      muscleBadge: "腹",
+      emoji: "🔥",
+      steps: [
+        "座椅調穩，胸墊／手把握於舒適高度，背貼起始位。",
+        "核心收緊，呼氣將軀幹向前／向下捲曲。",
+        "頂端輕停感受腹直肌，頸保持中立唔用力拉。",
+        "吸氣控制回到起始，唔完全放鬆彈回。"
+      ],
+      mistakes: ["用手或頸硬拉", "用衝力甩", "過度弓腰還原", "重量過重失去腹感"],
+      prescription: "新手 3 組 × 10–15 次",
+      safety: "下背尖銳痛即停；適合作核心輔助，配合平板撑更全面。示意非醫療。"
+    },
+    {
+      id: "lateral-raise-machine",
+      name: "側平舉機",
+      category: "gym",
+      muscles: ["shoulders"],
+      formCue: "head",
+      wrongCue: "聳肩、甩重量",
+      rightCue: "肘微屈側抬至肩高",
+      muscleBadge: "中三角",
+      emoji: "🪽",
+      steps: [
+        "站穩於飛鳥／側平舉機，雙手握側把手（或墊於上臂，視機型）。",
+        "核心收緊，肘微屈，呼氣向兩側平舉至約肩高。",
+        "頂端感受中三角，唔過度超過肩太多。",
+        "吸氣控制下放，全程唔聳肩借斜方。"
+      ],
+      mistakes: ["聳肩至耳邊", "用衝力甩起", "手臂完全伸直鎖死", "過度後仰借力"],
+      prescription: "新手 3 組 × 10–15 次",
+      safety: "肩不適减幅度或减重；站姿多方位飛鳥機可調滑輪高度，先求側平軌跡。示意非醫療。"
+    },
+    {
+      id: "assisted-pullup",
+      name: "助力引體向上",
+      category: "gym",
+      muscles: ["back", "arms"],
+      formCue: "spine",
+      wrongCue: "只彎手無背感、甩腿",
+      rightCue: "肩胛下壓再拉起",
+      muscleBadge: "背",
+      emoji: "🆙",
+      steps: [
+        "選合適助力（越重助力越易）；膝或腳踩輔助墊，雙手握上方橫槓。",
+        "肩胛先下壓後夾，呼氣將身體向上拉。",
+        "拉至下巴接近槓或舒適高度，肘向下向後。",
+        "吸氣控制下放至手臂伸展但仍有背張力。"
+      ],
+      mistakes: ["只用手臂弯舉式拉", "身體大幅前後甩", "聳肩縮頸", "下放砸死"],
+      prescription: "新手 3 組 × 6–10 次",
+      safety: "肩活動受限可改中立握；逐步减助力。示意教學，非醫療建議。"
+    },
+    {
+      id: "straight-arm-pulldown",
+      name: "直臂下壓",
+      category: "gym",
+      muscles: ["back"],
+      formCue: "spine",
+      wrongCue: "弯肘變下拉、甩腰",
+      rightCue: "手臂近似伸直壓至髖",
+      muscleBadge: "闊背",
+      emoji: "⬇️",
+      steps: [
+        "站於高位拉力器或直臂下壓機前，雙手握槓／把手，手臂近似伸直。",
+        "微屈髖、核心收，呼氣將把手由高位壓向大腿前方。",
+        "感受闊背發力，肘保持微屈但唔變成划船。",
+        "吸氣控制回升至肩高附近，保持張力。"
+      ],
+      mistakes: ["過度弯肘變成下拉", "用腰前後甩", "聳肩", "鎖死手肘痛"],
+      prescription: "新手 3 組 × 10–12 次",
+      safety: "重量以能保持直臂軌跡為準；肩前不适可减幅度。示意非醫療。"
+    },
+    {
+      id: "incline-chest-press",
+      name: "上斜坐姿推胸機",
+      category: "gym",
+      muscles: ["chest", "shoulders", "arms"],
+      formCue: "spine",
+      wrongCue: "聳肩、過度拱腰",
+      rightCue: "肩胛後夾、軌跡斜上",
+      muscleBadge: "上胸",
+      emoji: "📐",
+      steps: [
+        "座椅／靠墊呈上斜（約 30–45°），握把約對上胸高度，背貼墊。",
+        "肩胛微後夾，雙手握獨立手把。",
+        "呼氣向前上方推出至手臂接近伸直（唔鎖死）。",
+        "吸氣控制還原至上胸有拉伸感但唔過肩。"
+      ],
+      mistakes: ["聳肩", "過度拱腰離墊", "用衝力甩推", "下放過深扯肩"],
+      prescription: "新手 3 組 × 8–12 次",
+      safety: "上斜較易帶到前三角，重量保守；肩舊患先咨詢專業人士。示意非醫療。"
+    },
+    {
+      id: "treadmill",
+      name: "跑步機",
+      category: "cardio",
+      muscles: ["cardio", "legs", "glutes"],
+      formCue: "spine",
+      wrongCue: "扶手挂身、步幅亂",
+      rightCue: "軀幹直、自然步幅",
+      muscleBadge: "有氧",
+      emoji: "🏃",
+      steps: [
+        "先站穩兩側踏板，啟動後再踏上跑帶；速度由慢行開始。",
+        "目光向前，軀幹直立，手臂自然擺動。",
+        "腳掌中前掌着地，步幅自然，唔刻意跨大步。",
+        "結束先减速至步行，再停機落機。"
+      ],
+      mistakes: ["雙手用力挂扶手代步", "低頭看腳", "速度突變失控", "急停跳落"],
+      prescription: "新手 15–25 分鐘輕至中等強度（可對話）",
+      safety: "夾繩安全鎖；膝踝不適改慢行或停。示意教學，非醫療／心肺評估。"
+    },
+    {
+      id: "elliptical",
+      name: "橢圓機",
+      category: "cardio",
+      muscles: ["cardio", "legs", "glutes"],
+      formCue: "spine",
+      wrongCue: "挂扶手、駝背",
+      rightCue: "直立踩圓、輕握把手",
+      muscleBadge: "有氧",
+      emoji: "🔄",
+      steps: [
+        "雙腳踏穩踏板，雙手輕握活動把手或固定把手。",
+        "軀幹直立，踩出橢圓軌跡，阻力由低開始。",
+        "可正向或反向踩，保持核心輕收。",
+        "完成後减阻力减速，再踏穩落機。"
+      ],
+      mistakes: ["整個人挂在把手上", "過度前傾駝背", "阻力過高令膝硬頂", "踏板未停妥就落機"],
+      prescription: "新手 15–25 分鐘輕至中等強度",
+      safety: "對關節相對溫和，但仍要循序；暈眩或不適即停。示意非醫療。"
+    },
+    {
+      id: "upright-bike",
+      name: "直立單車",
+      category: "cardio",
+      muscles: ["cardio", "legs"],
+      formCue: "knee",
+      wrongCue: "座太低膝過度屈、聳肩",
+      rightCue: "座高適中、軀幹微傾",
+      muscleBadge: "有氧",
+      emoji: "🚴",
+      steps: [
+        "調座高度：腳在最低點時膝約微屈。",
+        "雙手輕握車頭，軀幹微前傾但唔塌腰。",
+        "腳掌踏穩，以可對話節奏踩動。",
+        "結束减速，雙腳踏穩再落車。"
+      ],
+      mistakes: ["座椅過低致膝過度屈曲", "雙手死握聳肩", "阻力驟加失控", "下背過度圓塌"],
+      prescription: "新手 15–25 分鐘輕至中等強度",
+      safety: "膝前痛可调高座或减阻力；示意非醫療。"
+    },
+    {
+      id: "recumbent-bike",
+      name: "靠背單車",
+      category: "cardio",
+      muscles: ["cardio", "legs"],
+      formCue: "knee",
+      wrongCue: "腰離墊、座距不當",
+      rightCue: "背貼墊、膝微屈最低點",
+      muscleBadge: "有氧",
+      emoji: "🪑",
+      steps: [
+        "坐穩背貼靠墊，調座距至腳最低點膝約微屈。",
+        "雙手握前方把手，核心輕收。",
+        "以平穩節奏踩動，阻力由低開始。",
+        "結束减速，確認踏板停穩再起身。"
+      ],
+      mistakes: ["腰離開靠墊代發力", "座距過近令膝過度屈", "突然加大阻力", "起身過急失平衡"],
+      prescription: "新手 15–25 分鐘輕至中等強度",
+      safety: "靠背版對下背較友善，但仍要調好距離；不適即停。示意非醫療。"
+    },
+    {
+      id: "stair-climber",
+      name: "樓梯機",
+      category: "cardio",
+      muscles: ["cardio", "legs", "glutes"],
+      formCue: "knee",
+      wrongCue: "挂扶手、踩太重砸步",
+      rightCue: "軀幹直、輕踩連步",
+      muscleBadge: "有氧",
+      emoji: "🪜",
+      steps: [
+        "雙手輕扶側桿保持平衡，唔將體重挂死扶手。",
+        "軀幹直立，一步接一步踏上，節奏由慢開始。",
+        "全腳掌或中足着步，臀腿發力。",
+        "結束减速至可穩站，再落機。"
+      ],
+      mistakes: ["雙臂挂扶手減負荷過度", "步頻過快失控", "低頭駝背", "膝內扣砸步"],
+      prescription: "新手 8–15 分鐘輕至中等強度",
+      safety: "強度較高，初學短時間起步；膝踝不適即改其他有氧。示意非醫療。"
+    },
+
     /* —— 家用／徒手／啞鈴 —— */
     {
       id: "bw-squat",
@@ -507,7 +798,7 @@ window.FITNESS_DATA = {
 
   challenge: {
     title: "21 日入門挑戰",
-    subtitle: "每日一動作 · 示意圖解 · 而家內建 21 款解剖圖解示意短片 · 其餘可自備連結",
+    subtitle: "每日一動作 · 示意圖解 · 而家內建 35 款解剖圖解示意短片 · 其餘可自備連結",
     days: [
       { day: 1, exerciseId: "pushup" },
       { day: 2, exerciseId: "db-curl" },
