@@ -2,9 +2,11 @@
 (function () {
   "use strict";
 
-  const STORAGE_KEY = "fitnessCoachLite.logs.v1";
+  const LEGACY_LOG_KEY = "fitnessCoachLite.logs.v1";
   const VIDEO_KEY = "fitnessCoachLite.videos.v1";
-  const CACHE = "20261028f";
+  const USERS_KEY = "fitnessCoachLite.users.v1";
+  const SESSION_KEY = "fitnessCoachLite.session.v1";
+  const CACHE = "20261028g";
   const BUNDLED_VIDEOS = {
     "db-row": { src: "assets/videos/db-row.mp4", poster: "assets/videos/db-row.jpg" },
     "db-shoulder-press": { src: "assets/videos/db-shoulder-press.mp4", poster: "assets/videos/db-shoulder-press.jpg" },
@@ -59,9 +61,114 @@
     return c === "gym" ? "健身房" : "家用";
   }
 
-  function loadLogs() {
+  /* —— Auth (local multi-account) —— */
+  function toHex(buffer) {
+    const bytes = new Uint8Array(buffer);
+    let out = "";
+    for (let i = 0; i < bytes.length; i++) {
+      out += bytes[i].toString(16).padStart(2, "0");
+    }
+    return out;
+  }
+
+  async function sha256Hex(str) {
+    const data = new TextEncoder().encode(String(str));
+    const digest = await crypto.subtle.digest("SHA-256", data);
+    return toHex(digest);
+  }
+
+  function randomSalt() {
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    return toHex(bytes);
+  }
+
+  async function hashPassword(salt, password) {
+    return sha256Hex(String(salt) + String(password));
+  }
+
+  function loadUsers() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(USERS_KEY);
+      if (!raw) return {};
+      const obj = JSON.parse(raw);
+      return obj && typeof obj === "object" ? obj : {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function saveUsers(map) {
+    localStorage.setItem(USERS_KEY, JSON.stringify(map));
+  }
+
+  function normalizeUsername(raw) {
+    return String(raw || "").trim().toLowerCase();
+  }
+
+  function validateUsername(raw) {
+    const u = String(raw || "").trim();
+    if (u.length < 2 || u.length > 20) return "用戶名要 2–20 個字";
+    if (!/^[A-Za-z0-9_一-鿿㐀-䶿]+$/.test(u)) {
+      return "用戶名只可以用英文字母、數字、底線或中文";
+    }
+    return "";
+  }
+
+  function getSession() {
+    try {
+      const raw = localStorage.getItem(SESSION_KEY);
+      if (!raw) return null;
+      const obj = JSON.parse(raw);
+      if (!obj || typeof obj.username !== "string") return null;
+      const key = normalizeUsername(obj.username);
+      const users = loadUsers();
+      if (!users[key]) return null;
+      return { username: key };
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function setSession(username) {
+    if (!username) {
+      localStorage.removeItem(SESSION_KEY);
+      return;
+    }
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ username: normalizeUsername(username) }));
+  }
+
+  function currentUser() {
+    const sess = getSession();
+    if (!sess) return null;
+    const users = loadUsers();
+    return users[sess.username] || null;
+  }
+
+  function isLoggedIn() {
+    return !!currentUser();
+  }
+
+  function userLogKey(username) {
+    return LEGACY_LOG_KEY + "." + normalizeUsername(username);
+  }
+
+  function loadLegacyLogs() {
+    try {
+      const raw = localStorage.getItem(LEGACY_LOG_KEY);
+      if (!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function loadLogs() {
+    const user = currentUser();
+    if (!user) return [];
+    try {
+      const raw = localStorage.getItem(userLogKey(user.username));
       if (!raw) return [];
       const arr = JSON.parse(raw);
       return Array.isArray(arr) ? arr : [];
@@ -71,7 +178,164 @@
   }
 
   function saveLogs(logs) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+    const user = currentUser();
+    if (!user) return;
+    localStorage.setItem(userLogKey(user.username), JSON.stringify(logs));
+  }
+
+  async function registerUser(usernameRaw, password, displayName) {
+    const err = validateUsername(usernameRaw);
+    if (err) return { ok: false, error: err };
+    const key = normalizeUsername(usernameRaw);
+    if (password.length < 4) return { ok: false, error: "密碼至少 4 個字" };
+    const users = loadUsers();
+    if (users[key]) return { ok: false, error: "呢個用戶名已經有人用" };
+    const salt = randomSalt();
+    const passHash = await hashPassword(salt, password);
+    const display = String(displayName || "").trim() || String(usernameRaw).trim();
+    users[key] = {
+      username: key,
+      displayName: display,
+      passHash: passHash,
+      salt: salt,
+      createdAt: new Date().toISOString()
+    };
+    saveUsers(users);
+    if (!localStorage.getItem(userLogKey(key))) {
+      localStorage.setItem(userLogKey(key), "[]");
+    }
+    setSession(key);
+    return { ok: true, user: users[key] };
+  }
+
+  async function loginUser(usernameRaw, password) {
+    const key = normalizeUsername(usernameRaw);
+    if (!key) return { ok: false, error: "請輸入用戶名" };
+    if (!password) return { ok: false, error: "請輸入密碼" };
+    const users = loadUsers();
+    const user = users[key];
+    if (!user) return { ok: false, error: "用戶名或密碼唔正確" };
+    const hash = await hashPassword(user.salt, password);
+    if (hash !== user.passHash) return { ok: false, error: "用戶名或密碼唔正確" };
+    setSession(key);
+    return { ok: true, user: user };
+  }
+
+  function logoutUser() {
+    setSession(null);
+  }
+
+  function migrateLegacyIntoCurrent() {
+    const user = currentUser();
+    if (!user) return { ok: false, error: "未登入" };
+    const legacy = loadLegacyLogs();
+    if (!legacy.length) return { ok: false, error: "冇舊記錄" };
+    const existing = loadLogs();
+    const merged = legacy.concat(existing);
+    saveLogs(merged);
+    localStorage.removeItem(LEGACY_LOG_KEY);
+    return { ok: true, count: legacy.length };
+  }
+
+  function updateAccountChip() {
+    const chip = $("#accountChip");
+    if (!chip) return;
+    const user = currentUser();
+    if (!user) {
+      chip.innerHTML = `<button type="button" class="btn ghost account-btn" id="authOpenBtn" data-open-auth>登入／註冊</button>`;
+      return;
+    }
+    const name = escapeHtml(user.displayName || user.username);
+    chip.innerHTML = `
+      <span class="account-name" title="${name}">${name}</span>
+      <button type="button" class="btn ghost account-btn" id="logoutBtn" data-logout>登出</button>`;
+  }
+
+  function setAuthError(id, msg) {
+    const el = $(id);
+    if (!el) return;
+    if (!msg) {
+      el.hidden = true;
+      el.textContent = "";
+      return;
+    }
+    el.hidden = false;
+    el.textContent = msg;
+  }
+
+  function openAuthModal(tab) {
+    const modal = $("#authModal");
+    if (!modal) return;
+    switchAuthTab(tab === "register" ? "register" : "login");
+    setAuthError("#loginError", "");
+    setAuthError("#regError", "");
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    const focusId = tab === "register" ? "#regUser" : "#loginUser";
+    const focusEl = $(focusId);
+    if (focusEl) setTimeout(() => focusEl.focus(), 50);
+  }
+
+  function closeAuthModal() {
+    const modal = $("#authModal");
+    if (!modal) return;
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  function switchAuthTab(tab) {
+    $$("[data-auth-tab-btn]").forEach((b) => {
+      const on = b.dataset.authTabBtn === tab;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    $$("[data-auth-pane]").forEach((p) => {
+      const on = p.dataset.authPane === tab;
+      p.hidden = !on;
+    });
+    const title = $("#authModalTitle");
+    if (title) title.textContent = tab === "register" ? "註冊" : "登入";
+  }
+
+  async function onLoginSubmit(ev) {
+    ev.preventDefault();
+    setAuthError("#loginError", "");
+    const user = ($("#loginUser") && $("#loginUser").value) || "";
+    const pass = ($("#loginPass") && $("#loginPass").value) || "";
+    const res = await loginUser(user, pass);
+    if (!res.ok) {
+      setAuthError("#loginError", res.error);
+      return;
+    }
+    if ($("#loginPass")) $("#loginPass").value = "";
+    closeAuthModal();
+    updateAccountChip();
+    toast("歡迎返嚟，" + (res.user.displayName || res.user.username));
+    if (state.view === "log") renderLog();
+  }
+
+  async function onRegisterSubmit(ev) {
+    ev.preventDefault();
+    setAuthError("#regError", "");
+    const user = ($("#regUser") && $("#regUser").value) || "";
+    const display = ($("#regDisplay") && $("#regDisplay").value) || "";
+    const pass = ($("#regPass") && $("#regPass").value) || "";
+    const pass2 = ($("#regPass2") && $("#regPass2").value) || "";
+    if (pass !== pass2) {
+      setAuthError("#regError", "兩次密碼唔一致");
+      return;
+    }
+    const res = await registerUser(user, pass, display);
+    if (!res.ok) {
+      setAuthError("#regError", res.error);
+      return;
+    }
+    if ($("#regPass")) $("#regPass").value = "";
+    if ($("#regPass2")) $("#regPass2").value = "";
+    closeAuthModal();
+    updateAccountChip();
+    toast("註冊成功，已登入");
+    if (state.view === "log") renderLog();
   }
 
   function loadVideos() {
@@ -424,6 +688,11 @@
   }
 
   function openQuickLog(exerciseId) {
+    if (!isLoggedIn()) {
+      toast("請先登入");
+      openAuthModal("login");
+      return;
+    }
     const ex = byId(exerciseId);
     const modal = $("#logModal");
     if (!ex || !modal) return;
@@ -447,6 +716,12 @@
 
   function submitQuickLog(ev) {
     ev.preventDefault();
+    if (!isLoggedIn()) {
+      toast("請先登入");
+      closeQuickLog();
+      openAuthModal("login");
+      return;
+    }
     const id = $("#logExId").value;
     const ex = byId(id);
     if (!ex) return;
@@ -472,6 +747,10 @@
   }
 
   function deleteLog(id) {
+    if (!isLoggedIn()) {
+      toast("請先登入");
+      return;
+    }
     const logs = loadLogs().filter((x) => x.id !== id);
     saveLogs(logs);
     renderLog();
@@ -481,8 +760,51 @@
   function renderLog() {
     const listEl = $("#logList");
     const summary = $("#logSummary");
+    const lead = $("#logLead");
+    const gate = $("#logGate");
+    const controls = $("#logControls");
+    const migrate = $("#logMigrate");
     if (!listEl) return;
-    let logs = loadLogs();
+
+    const user = currentUser();
+    if (!user) {
+      if (lead) {
+        lead.textContent =
+          "請先註冊或登入，先可以記錄同睇自己嘅訓練。資料只存此裝置瀏覽器，唔上雲。";
+      }
+      if (gate) gate.hidden = false;
+      if (controls) controls.hidden = true;
+      if (migrate) migrate.hidden = true;
+      listEl.innerHTML = "";
+      if (summary) summary.textContent = "";
+      return;
+    }
+
+    if (lead) {
+      lead.textContent =
+        "已登入：" +
+        (user.displayName || user.username) +
+        " · 記錄只存此裝置瀏覽器，唔上雲。";
+    }
+    if (gate) gate.hidden = true;
+    if (controls) controls.hidden = false;
+
+    const legacy = loadLegacyLogs();
+    const myLogs = loadLogs();
+    if (migrate) {
+      if (legacy.length && myLogs.length === 0) {
+        migrate.hidden = false;
+        const mt = $("#logMigrateText");
+        if (mt) {
+          mt.textContent =
+            "發現本機舊記錄 " + legacy.length + " 筆，匯入到我嘅帳戶？";
+        }
+      } else {
+        migrate.hidden = true;
+      }
+    }
+
+    let logs = myLogs.slice();
     if (state.logFilterDate) {
       logs = logs.filter((l) => l.date === state.logFilterDate);
     }
@@ -490,11 +812,12 @@
       logs = logs.filter((l) => (l.muscles || []).includes(state.logFilterMuscle));
     }
     if (summary) {
-      const all = loadLogs();
-      summary.textContent = `本機共 ${all.length} 筆 · 目前顯示 ${logs.length} 筆`;
+      summary.textContent =
+        "本帳戶共 " + myLogs.length + " 筆 · 目前顯示 " + logs.length + " 筆";
     }
     if (!logs.length) {
-      listEl.innerHTML = `<p class="empty">未有訓練記錄。去「儀器／動作」或「短片教學」撳「今日訓練」即可新增。</p>`;
+      listEl.innerHTML =
+        '<p class="empty">未有訓練記錄。去「儀器／動作」或「短片教學」撳「今日訓練」即可新增。</p>';
       return;
     }
     listEl.innerHTML = logs
@@ -504,20 +827,38 @@
             ? "自體／未填重量"
             : l.weightKg + " kg";
         const tags = (l.muscles || [])
-          .map((m) => `<span class="tag">${muscleName(m)}</span>`)
+          .map((m) => '<span class="tag">' + muscleName(m) + "</span>")
           .join("");
-        return `
-        <article class="card log-card">
-          <div class="log-top">
-            <div>
-              <h3>${l.exerciseName}</h3>
-              <p class="muted tiny">${l.date} · <span class="pill ${l.category}">${catLabel(l.category)}</span> ${tags}</p>
-            </div>
-            <button type="button" class="icon-btn" data-del-log="${l.id}" aria-label="刪除記錄">🗑</button>
-          </div>
-          <p class="log-sets"><strong>${l.sets}</strong> 組 × <strong>${l.reps}</strong> 次 · ${w}</p>
-          ${l.notes ? `<p class="muted tiny">備註：${escapeHtml(l.notes)}</p>` : ""}
-        </article>`;
+        return (
+          '<article class="card log-card">' +
+          '<div class="log-top"><div>' +
+          "<h3>" +
+          escapeHtml(l.exerciseName) +
+          "</h3>" +
+          '<p class="muted tiny">' +
+          escapeHtml(l.date) +
+          ' · <span class="pill ' +
+          escapeAttr(l.category) +
+          '">' +
+          catLabel(l.category) +
+          "</span> " +
+          tags +
+          "</p></div>" +
+          '<button type="button" class="icon-btn" data-del-log="' +
+          escapeAttr(l.id) +
+          '" aria-label="刪除記錄">🗑</button></div>' +
+          '<p class="log-sets"><strong>' +
+          l.sets +
+          "</strong> 組 × <strong>" +
+          l.reps +
+          "</strong> 次 · " +
+          w +
+          "</p>" +
+          (l.notes
+            ? '<p class="muted tiny">備註：' + escapeHtml(l.notes) + "</p>"
+            : "") +
+          "</article>"
+        );
       })
       .join("");
   }
@@ -604,6 +945,42 @@
       showView(t.dataset.view);
       return;
     }
+    const openAuth = ev.target.closest("[data-open-auth]");
+    if (openAuth) {
+      openAuthModal(openAuth.dataset.authTab || "login");
+      return;
+    }
+    const tabBtn = ev.target.closest("[data-auth-tab-btn]");
+    if (tabBtn) {
+      switchAuthTab(tabBtn.dataset.authTabBtn);
+      return;
+    }
+    if (ev.target.closest("[data-close-auth]")) {
+      closeAuthModal();
+      return;
+    }
+    if (ev.target.closest("[data-logout]")) {
+      logoutUser();
+      updateAccountChip();
+      toast("已登出");
+      if (state.view === "log") renderLog();
+      return;
+    }
+    if (ev.target.id === "migrateLegacyBtn") {
+      const res = migrateLegacyIntoCurrent();
+      if (res.ok) {
+        toast("已匯入 " + res.count + " 筆舊記錄");
+        renderLog();
+      } else {
+        toast(res.error || "匯入失敗");
+      }
+      return;
+    }
+    if (ev.target.id === "dismissMigrateBtn") {
+      const migrate = $("#logMigrate");
+      if (migrate) migrate.hidden = true;
+      return;
+    }
     const openShorts = ev.target.closest("[data-open-ex-shorts]");
     if (openShorts) {
       openDetail(openShorts.dataset.openExShorts, true);
@@ -681,6 +1058,10 @@
     document.addEventListener("click", onClick);
     const form = $("#logForm");
     if (form) form.addEventListener("submit", submitQuickLog);
+    const loginForm = $("#authLoginForm");
+    if (loginForm) loginForm.addEventListener("submit", onLoginSubmit);
+    const regForm = $("#authRegisterForm");
+    if (regForm) regForm.addEventListener("submit", onRegisterSubmit);
     const backdrop = $("#detailBackdrop");
     if (backdrop) backdrop.addEventListener("click", closeDetail);
     const logModal = $("#logModal");
@@ -689,6 +1070,13 @@
         if (e.target === logModal) closeQuickLog();
       });
     }
+    const authModal = $("#authModal");
+    if (authModal) {
+      authModal.addEventListener("click", (e) => {
+        if (e.target === authModal) closeAuthModal();
+      });
+    }
+    updateAccountChip();
     initStats();
     showView("muscles");
   });
