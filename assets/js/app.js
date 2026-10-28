@@ -4,7 +4,7 @@
 
   const STORAGE_KEY = "fitnessCoachLite.logs.v1";
   const VIDEO_KEY = "fitnessCoachLite.videos.v1";
-  const CACHE = "20261028e";
+  const CACHE = "20261028f";
   const BUNDLED_VIDEOS = {
     "db-row": { src: "assets/videos/db-row.mp4", poster: "assets/videos/db-row.jpg" },
     "db-shoulder-press": { src: "assets/videos/db-shoulder-press.mp4", poster: "assets/videos/db-shoulder-press.jpg" },
@@ -20,7 +20,10 @@
     "lunge": { src: "assets/videos/lunge.mp4", poster: "assets/videos/lunge.jpg" },
     "seated-row": { src: "assets/videos/seated-row.mp4", poster: "assets/videos/seated-row.jpg" },
     "face-pull": { src: "assets/videos/face-pull.mp4", poster: "assets/videos/face-pull.jpg" },
-    "triceps-pushdown": { src: "assets/videos/triceps-pushdown.mp4", poster: "assets/videos/triceps-pushdown.jpg" }
+    "triceps-pushdown": { src: "assets/videos/triceps-pushdown.mp4", poster: "assets/videos/triceps-pushdown.jpg" },
+    "smith-bench": { src: "assets/videos/smith-bench.mp4", poster: "assets/videos/smith-bench.jpg" },
+    "shoulder-press-machine": { src: "assets/videos/shoulder-press-machine.mp4", poster: "assets/videos/shoulder-press-machine.jpg" },
+    "dumbbell-press-home": { src: "assets/videos/dumbbell-press-home.mp4", poster: "assets/videos/dumbbell-press-home.jpg" }
   };
   const data = window.FITNESS_DATA;
   const anatomy = window.FITNESS_ANATOMY;
@@ -116,7 +119,7 @@
         </div>`
       : `<div class="video-placeholder">
           <strong>未有內建短片</strong>
-          <span>可自備 YouTube／短片網址（本機儲存）。而家內建 15 款解剖圖解示意短片。</span>
+          <span>可自備 YouTube／短片網址（本機儲存）。而家內建 18 款解剖圖解示意短片。</span>
         </div>`;
     return `
       <section class="video-slot">
