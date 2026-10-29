@@ -1764,3 +1764,146 @@ img, video, svg, .anatomy-svg { max-width: 100%; height: auto; }
     min-height: 420px;
   }
 }
+
+
+/* —— 女圖／男圖偏好 · 女士普拉提 CTA · 目標／營養 —— */
+.topbar-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: 58%;
+}
+.gender-prefs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--line);
+}
+.gender-prefs-label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  padding: 0 6px 0 8px;
+  white-space: nowrap;
+}
+.gender-chip {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 999px;
+  min-height: 32px;
+  cursor: pointer;
+}
+.gender-chip.active {
+  background: rgba(232, 197, 71, 0.2);
+  color: var(--gold, #e8c547);
+}
+.gender-chip:focus-visible {
+  outline: 2px solid var(--gold, #e8c547);
+  outline-offset: 1px;
+}
+.btn.pilates-cta {
+  background: linear-gradient(135deg, rgba(186, 140, 255, 0.35), rgba(232, 197, 71, 0.2));
+  border: 1px solid rgba(186, 140, 255, 0.55);
+  color: #f0e6ff;
+  font-weight: 700;
+}
+.btn.pilates-cta:hover {
+  background: linear-gradient(135deg, rgba(186, 140, 255, 0.5), rgba(232, 197, 71, 0.28));
+}
+.catalog-chip.pilates-highlight {
+  border-color: rgba(186, 140, 255, 0.55);
+  color: #e4d0ff;
+}
+.catalog-chip.pilates-highlight.active {
+  background: rgba(186, 140, 255, 0.28);
+  color: #f5ecff;
+}
+.lady-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #d2b4ff;
+  background: rgba(186, 140, 255, 0.15);
+  border: 1px solid rgba(186, 140, 255, 0.35);
+  border-radius: 999px;
+  padding: 4px 10px;
+  margin-left: 4px;
+}
+.poster-fallback-pill {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.72);
+  color: #ffd89a;
+  border-radius: 6px;
+  padding: 3px 7px;
+  pointer-events: none;
+}
+.poster-media { position: relative; }
+.poster-fallback-note {
+  margin: 6px 0 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.danger-btn {
+  color: #ffb4b4 !important;
+  border-color: rgba(255, 120, 120, 0.45) !important;
+  min-height: 40px;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+.danger-btn:hover {
+  background: rgba(255, 80, 80, 0.15) !important;
+}
+.goals-form .goals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.goals-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0;
+}
+.stat-pill {
+  flex: 1 1 120px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stat-pill.wide { flex: 1 1 100%; }
+.stat-k { font-size: 0.75rem; color: var(--muted); }
+.stat-v { font-size: 1.35rem; font-weight: 800; color: var(--gold, #e8c547); }
+.stat-u { font-size: 0.72rem; color: var(--muted); }
+.meal-card {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.22);
+}
+.meal-card h4 { margin: 0 0 8px; font-size: 1rem; }
+.goals-result { margin-top: 12px; }
+@media (max-width: 720px) {
+  .topbar-tools { max-width: 100%; width: 100%; justify-content: space-between; }
+  .gender-prefs-label { display: none; }
+  .account-chip { max-width: none; }
+}

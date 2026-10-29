@@ -61,7 +61,7 @@ window.FITNESS_DATA = {
       emoji: "🔥",
       tip: "核心唔止係腹肌，仲包括穩定腰椎同骨盆。平板撑先求時間同姿勢，再進階；呼吸要順，唔好閉氣用力。",
       targets: "腹直肌、腹橫肌、斜腹、豎脊肌（穩定）",
-      aliases: ["核心", "腹肌", "腹", "腰腹", "中軸", "core", "abs", "腹部", "抬腿", "捲腹", "普拉提", "拉根", "reformer", "pilates", "核心穩定", "女士拉根"],
+      aliases: ["核心", "腹肌", "腹", "腰腹", "中軸", "core", "abs", "腹部", "抬腿", "捲腹", "普拉提", "拉根", "reformer", "pilates", "核心穩定", "女士拉根", "女士", "女士普拉提", "女仔普拉提", "女士運動"],
       moves: ["plank", "hanging-leg-raise", "ab-crunch-machine", "glute-bridge", "bw-squat", "pilates-hundred", "pilates-roll-up", "pilates-single-leg-stretch", "pilates-bridge", "reformer-elephant", "reformer-knee-stretches"]
     },
     {
@@ -1016,6 +1016,71 @@ window.FITNESS_DATA = {
     { id: "recover", emoji: "😴", text: "肌肉要休息先有空間適應。同一大肌群可隔日再練；睡眠同飲水都係訓練一部分。" },
     { id: "form", emoji: "🎯", text: "寧願輕啲但軌跡清晰，都好過重量大到借腰借勢。有痛（尖銳）即停，唔好硬撐。" }
   ],
+
+
+  mealPlans: {
+    fatLoss: [
+      {
+        id: "fl-a",
+        title: "減脂示例 A · 港式輕食",
+        meals: [
+          { name: "早餐", items: "燕麥片＋低脂奶／豆漿、水煮蛋 1–2 隻、香蕉半條" },
+          { name: "午餐", items: "蒸魚或雞胸約掌心厚、白飯半碗至大半碗、清炒時菜一大碟" },
+          { name: "小食", items: "原味乳酪或希臘乳酪半杯、少量果仁（約一小撮）" },
+          { name: "晚餐", items: "豆腐或魚肉、雜菜湯麵（少油）、沙律菜或白灼菜" }
+        ],
+        proteinNote: "蛋白質來源：蛋、魚、雞胸、豆腐、乳酪"
+      },
+      {
+        id: "fl-b",
+        title: "減脂示例 B · 易買超市款",
+        meals: [
+          { name: "早餐", items: "全麥多士兩片＋雞蛋、番茄、黑咖啡或茶" },
+          { name: "午餐", items: "便當改少飯多菜：瘦肉絲／豆乾、西蘭花／菜心" },
+          { name: "小食", items: "蘋果或橙 1 個、無糖豆漿" },
+          { name: "晚餐", items: "蝦仁炒雜菜配少許米粉或蒟蒻、清湯" }
+        ],
+        proteinNote: "蛋白質來源：蛋、瘦肉、豆乾、蝦"
+      }
+    ],
+    muscleGain: [
+      {
+        id: "mg-a",
+        title: "增肌示例 A · 訓練日偏碳水",
+        meals: [
+          { name: "早餐", items: "燕麥＋牛奶、雞蛋 2–3 隻、香蕉" },
+          { name: "午餐", items: "飯一碗、雞胸或牛肉適量、炒菜、水果" },
+          { name: "小食", items: "乳酪＋香蕉、或三文治（全麥＋雞蛋／吞拿魚）" },
+          { name: "晚餐", items: "魚或瘦肉、薯仔或飯、大量蔬菜" }
+        ],
+        proteinNote: "蛋白質來源：蛋、雞胸、牛肉、魚、乳製品；訓練前後可加碳水"
+      },
+      {
+        id: "mg-b",
+        title: "增肌示例 B · 素食友善偏蛋白",
+        meals: [
+          { name: "早餐", items: "豆漿燕麥、花生醬多士薄塗、水果" },
+          { name: "午餐", items: "豆腐火腩改純豆腐／蛋、飯一碗、青菜" },
+          { name: "小食", items: "希臘乳酪或豆奶＋果仁" },
+          { name: "晚餐", items: "豆類咖喱配糙米、沙律加雞蛋" }
+        ],
+        proteinNote: "蛋白質來源：豆腐、豆漿、蛋、乳酪、豆類、果仁"
+      }
+    ],
+    maintain: [
+      {
+        id: "mt-a",
+        title: "維持示例 · 均衡三餐",
+        meals: [
+          { name: "早餐", items: "粥或多士＋蛋、青菜少許" },
+          { name: "午餐", items: "飯七八成飽、魚肉或瘦肉、兩款蔬菜" },
+          { name: "小食", items: "水果 1 個" },
+          { name: "晚餐", items: "湯麵或飯減半、蛋白質掌心厚、青菜" }
+        ],
+        proteinNote: "維持體重以總熱量接近消耗為主，蛋白質均勻分餐即可"
+      }
+    ]
+  },
 
   challenge: {
     title: "21 日入門挑戰",

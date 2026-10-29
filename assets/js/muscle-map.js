@@ -7,7 +7,7 @@ window.FITNESS_MUSCLE_MAP = (function () {
   const HL_GLOW = "rgba(255, 140, 60, 0.35)";
 
   /** 8 幀轉盤：拖曳左右旋轉（原創作解剖海報風格，非抄他牌） */
-  const FRAMES = [
+  const FRAMES_MALE = [
     { id: "front", src: "assets/img/bodymap/front.jpg", yaw: 0, hotspot: "front", label: "正面" },
     { id: "front-lq", src: "assets/img/bodymap/front-lq.jpg", yaw: 45, hotspot: "front", label: "左斜" },
     { id: "side-l", src: "assets/img/bodymap/side-l.jpg", yaw: 90, hotspot: null, label: "左側" },
@@ -17,6 +17,23 @@ window.FITNESS_MUSCLE_MAP = (function () {
     { id: "side-r", src: "assets/img/bodymap/side-r.jpg", yaw: 270, hotspot: null, label: "右側" },
     { id: "front-rq", src: "assets/img/bodymap/front-rq.jpg", yaw: 315, hotspot: "front", label: "右斜" }
   ];
+  const FRAMES_FEMALE = [
+    { id: "front", src: "assets/img/bodymap/f-front.jpg", yaw: 0, hotspot: "front", label: "正面" },
+    { id: "front-lq", src: "assets/img/bodymap/f-front-lq.jpg", yaw: 45, hotspot: "front", label: "左斜" },
+    { id: "side-l", src: "assets/img/bodymap/f-side-l.jpg", yaw: 90, hotspot: null, label: "左側" },
+    { id: "back-lq", src: "assets/img/bodymap/f-back-lq.jpg", yaw: 135, hotspot: "back", label: "背左斜" },
+    { id: "back", src: "assets/img/bodymap/f-back.jpg", yaw: 180, hotspot: "back", label: "背面" },
+    { id: "back-rq", src: "assets/img/bodymap/f-back-rq.jpg", yaw: 225, hotspot: "back", label: "背右斜" },
+    { id: "side-r", src: "assets/img/bodymap/f-side-r.jpg", yaw: 270, hotspot: null, label: "右側" },
+    { id: "front-rq", src: "assets/img/bodymap/f-front-rq.jpg", yaw: 315, hotspot: "front", label: "右斜" }
+  ];
+  /** @deprecated use getFrames(visualGender); default male/neutral */
+  const FRAMES = FRAMES_MALE;
+
+  function getFrames(visualGender) {
+    if (visualGender === "female") return FRAMES_FEMALE;
+    return FRAMES_MALE;
+  }
 
   const regions = [
     {
@@ -328,15 +345,17 @@ window.FITNESS_MUSCLE_MAP = (function () {
     return regions.slice();
   }
 
-  function frameAt(index) {
-    const n = FRAMES.length;
+  function frameAt(index, visualGender) {
+    const frames = getFrames(visualGender);
+    const n = frames.length;
     const i = ((index % n) + n) % n;
-    return FRAMES[i];
+    return frames[i];
   }
 
-  function indexForSide(side) {
-    if (side === "back") return FRAMES.findIndex((f) => f.id === "back");
-    return FRAMES.findIndex((f) => f.id === "front");
+  function indexForSide(side, visualGender) {
+    const frames = getFrames(visualGender);
+    if (side === "back") return frames.findIndex((f) => f.id === "back");
+    return frames.findIndex((f) => f.id === "front");
   }
 
   function bestFrameForRegion(region) {
@@ -359,6 +378,9 @@ window.FITNESS_MUSCLE_MAP = (function () {
   return {
     regions,
     FRAMES,
+    FRAMES_MALE,
+    FRAMES_FEMALE,
+    getFrames,
     byId,
     frontSvg,
     backSvg,

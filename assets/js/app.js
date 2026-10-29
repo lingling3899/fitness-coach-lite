@@ -6,7 +6,9 @@
   const VIDEO_KEY = "fitnessCoachLite.videos.v1";
   const USERS_KEY = "fitnessCoachLite.users.v1";
   const SESSION_KEY = "fitnessCoachLite.session.v1";
-  const CACHE = "20261029f";
+  const CACHE = "20261029g";
+  const PREFS_KEY = "fitnessCoachLite.prefs.v1";
+  const GOALS_KEY_PREFIX = "fitnessCoachLite.goals.v1.";
   const BUNDLED_VIDEOS = {
     "db-row": { src: "assets/videos/db-row.mp4", poster: "assets/videos/db-row.jpg" },
     "db-shoulder-press": { src: "assets/videos/db-shoulder-press.mp4", poster: "assets/videos/db-shoulder-press.jpg" },
@@ -43,17 +45,17 @@
     "upright-bike": { src: "assets/videos/upright-bike.mp4", poster: "assets/videos/upright-bike.jpg" },
     "recumbent-bike": { src: "assets/videos/recumbent-bike.mp4", poster: "assets/videos/recumbent-bike.jpg" },
     "stair-climber": { src: "assets/videos/stair-climber.mp4", poster: "assets/videos/stair-climber.jpg" },
-    "pilates-hundred": { src: "assets/videos/pilates-hundred.mp4", poster: "assets/videos/pilates-hundred.jpg" },
-    "pilates-roll-up": { src: "assets/videos/pilates-roll-up.mp4", poster: "assets/videos/pilates-roll-up.jpg" },
-    "pilates-single-leg-stretch": { src: "assets/videos/pilates-single-leg-stretch.mp4", poster: "assets/videos/pilates-single-leg-stretch.jpg" },
-    "pilates-swan": { src: "assets/videos/pilates-swan.mp4", poster: "assets/videos/pilates-swan.jpg" },
-    "pilates-side-kick": { src: "assets/videos/pilates-side-kick.mp4", poster: "assets/videos/pilates-side-kick.jpg" },
-    "pilates-bridge": { src: "assets/videos/pilates-bridge.mp4", poster: "assets/videos/pilates-bridge.jpg" },
-    "reformer-footwork": { src: "assets/videos/reformer-footwork.mp4", poster: "assets/videos/reformer-footwork.jpg" },
-    "reformer-leg-circles": { src: "assets/videos/reformer-leg-circles.mp4", poster: "assets/videos/reformer-leg-circles.jpg" },
-    "reformer-elephant": { src: "assets/videos/reformer-elephant.mp4", poster: "assets/videos/reformer-elephant.jpg" },
-    "reformer-arms-pulling": { src: "assets/videos/reformer-arms-pulling.mp4", poster: "assets/videos/reformer-arms-pulling.jpg" },
-    "reformer-knee-stretches": { src: "assets/videos/reformer-knee-stretches.mp4", poster: "assets/videos/reformer-knee-stretches.jpg" }
+    "pilates-hundred": { src: "assets/videos/pilates-hundred.mp4", poster: "assets/videos/pilates-hundred.jpg", posterFemale: "assets/videos/pilates-hundred-f.jpg" },
+    "pilates-roll-up": { src: "assets/videos/pilates-roll-up.mp4", poster: "assets/videos/pilates-roll-up.jpg", posterFemale: "assets/videos/pilates-roll-up-f.jpg" },
+    "pilates-single-leg-stretch": { src: "assets/videos/pilates-single-leg-stretch.mp4", poster: "assets/videos/pilates-single-leg-stretch.jpg", posterFemale: "assets/videos/pilates-single-leg-stretch-f.jpg" },
+    "pilates-swan": { src: "assets/videos/pilates-swan.mp4", poster: "assets/videos/pilates-swan.jpg", posterFemale: "assets/videos/pilates-swan-f.jpg" },
+    "pilates-side-kick": { src: "assets/videos/pilates-side-kick.mp4", poster: "assets/videos/pilates-side-kick.jpg", posterFemale: "assets/videos/pilates-side-kick-f.jpg" },
+    "pilates-bridge": { src: "assets/videos/pilates-bridge.mp4", poster: "assets/videos/pilates-bridge.jpg", posterFemale: "assets/videos/pilates-bridge-f.jpg" },
+    "reformer-footwork": { src: "assets/videos/reformer-footwork.mp4", poster: "assets/videos/reformer-footwork.jpg", posterFemale: "assets/videos/reformer-footwork-f.jpg" },
+    "reformer-leg-circles": { src: "assets/videos/reformer-leg-circles.mp4", poster: "assets/videos/reformer-leg-circles.jpg", posterFemale: "assets/videos/reformer-leg-circles-f.jpg" },
+    "reformer-elephant": { src: "assets/videos/reformer-elephant.mp4", poster: "assets/videos/reformer-elephant.jpg", posterFemale: "assets/videos/reformer-elephant-f.jpg" },
+    "reformer-arms-pulling": { src: "assets/videos/reformer-arms-pulling.mp4", poster: "assets/videos/reformer-arms-pulling.jpg", posterFemale: "assets/videos/reformer-arms-pulling-f.jpg" },
+    "reformer-knee-stretches": { src: "assets/videos/reformer-knee-stretches.mp4", poster: "assets/videos/reformer-knee-stretches.jpg", posterFemale: "assets/videos/reformer-knee-stretches-f.jpg" }
   };
   const data = window.FITNESS_DATA;
   const anatomy = window.FITNESS_ANATOMY;
@@ -81,7 +83,10 @@
     catalogCategory: "",
     bodymapSide: "front",
     bodymapFrame: 0,
-    bodymapRegion: null
+    bodymapRegion: null,
+    visualGender: "neutral",
+    lastGoalCalc: null,
+    selectedMealId: null
   };
 
   const GOAL_CHIPS = [
@@ -93,7 +98,7 @@
     { id: "core", label: "核心" },
     { id: "glutes", label: "臀" },
     { id: "cardio", label: "有氧" },
-    { id: "pilates", label: "普拉提" },
+    { id: "pilates", label: "普拉提 · 女士" },
     { id: "full", label: "全身" }
   ];
 
@@ -120,6 +125,128 @@
     if (c === "cardio") return "有氧";
     if (c === "pilates") return "普拉提";
     return "家用";
+  }
+
+  /* —— Prefs (visual gender) —— */
+  function loadPrefs() {
+    try {
+      const raw = localStorage.getItem(PREFS_KEY);
+      if (!raw) return { visualGender: "neutral" };
+      const o = JSON.parse(raw);
+      const g = o && o.visualGender;
+      if (g === "female" || g === "male" || g === "neutral") return { visualGender: g };
+    } catch (e) {}
+    return { visualGender: "neutral" };
+  }
+  function savePrefs(prefs) {
+    localStorage.setItem(PREFS_KEY, JSON.stringify(prefs || { visualGender: state.visualGender }));
+  }
+  function getVisualGender() {
+    return state.visualGender === "female" || state.visualGender === "male"
+      ? state.visualGender
+      : "neutral";
+  }
+  function setVisualGender(g) {
+    if (g !== "female" && g !== "male" && g !== "neutral") g = "neutral";
+    state.visualGender = g;
+    savePrefs({ visualGender: g });
+    syncGenderChips();
+    if (state.view === "bodymap") renderBodyMap();
+    if (state.view === "shorts") renderShorts();
+    if (state.view === "moves") renderMoves();
+    if (state.detailId) openDetail(state.detailId, state.detailFromShorts);
+    toast(g === "female" ? "已切換女圖" : g === "male" ? "已切換男圖" : "已切換通用圖");
+  }
+  function syncGenderChips() {
+    $$("[data-visual-gender]").forEach((b) => {
+      const on = b.dataset.visualGender === state.visualGender;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  function resolvePoster(bundled) {
+    if (!bundled) return { src: "", isFallback: true };
+    const g = getVisualGender();
+    if (g === "female" && bundled.posterFemale) {
+      return { src: bundled.posterFemale, isFallback: false };
+    }
+    if (g === "male" && bundled.posterMale) {
+      return { src: bundled.posterMale, isFallback: false };
+    }
+    const wantSpecific = g === "female" || g === "male";
+    const hasSpecific = g === "female" ? !!bundled.posterFemale : g === "male" ? !!bundled.posterMale : true;
+    return { src: bundled.poster, isFallback: wantSpecific ? !hasSpecific : false };
+  }
+
+  function bodyMapFrames() {
+    if (!muscleMap) return [];
+    const g = getVisualGender();
+    if (muscleMap.getFrames) {
+      return muscleMap.getFrames(g === "female" ? "female" : "male");
+    }
+    return muscleMap.FRAMES || [];
+  }
+
+  /* —— Goals / nutrition snapshots —— */
+  function goalsStorageKey() {
+    const u = currentUser();
+    return GOALS_KEY_PREFIX + (u ? u.username : "guest");
+  }
+  function loadGoalSnapshots() {
+    try {
+      const raw = localStorage.getItem(goalsStorageKey());
+      const list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch (e) {
+      return [];
+    }
+  }
+  function saveGoalSnapshots(list) {
+    localStorage.setItem(goalsStorageKey(), JSON.stringify(list || []));
+  }
+  function calcMifflin(sex, age, heightCm, weightKg, activity) {
+    const w = Number(weightKg);
+    const h = Number(heightCm);
+    const a = Number(age);
+    const act = Number(activity) || 1.375;
+    let bmr =
+      sex === "male"
+        ? 10 * w + 6.25 * h - 5 * a + 5
+        : 10 * w + 6.25 * h - 5 * a - 161;
+    bmr = Math.round(bmr);
+    const tdee = Math.round(bmr * act);
+    return { bmr, tdee, activity: act };
+  }
+  function calorieRangeForTarget(tdee, target) {
+    if (target === "fatLoss") {
+      return { low: tdee - 500, high: tdee - 300, label: "減脂約 TDEE−300～500" };
+    }
+    if (target === "muscleGain") {
+      return { low: tdee + 200, high: tdee + 300, label: "增肌約 TDEE＋200～300" };
+    }
+    return { low: tdee - 100, high: tdee + 100, label: "維持約接近 TDEE" };
+  }
+  function mealPlansFor(target) {
+    const plans = data.mealPlans || {};
+    if (target === "fatLoss") return plans.fatLoss || [];
+    if (target === "muscleGain") return plans.muscleGain || [];
+    return plans.maintain || [];
+  }
+  function suggestMovesForGoal(target, sex) {
+    if (target === "fatLoss") {
+      const ids =
+        sex === "female"
+          ? ["treadmill", "elliptical", "pilates-hundred", "pilates-bridge", "reformer-footwork", "bw-squat"]
+          : ["treadmill", "elliptical", "bw-squat", "pushup", "plank", "stair-climber"];
+      return ids.map(byId).filter(Boolean);
+    }
+    if (target === "muscleGain") {
+      return ["smith-bench", "seated-row", "smith-squat", "lat-pulldown", "db-shoulder-press", "glute-bridge"]
+        .map(byId)
+        .filter(Boolean);
+    }
+    return ["bw-squat", "pushup", "plank", "pilates-hundred"].map(byId).filter(Boolean);
   }
 
   /* —— Auth (local multi-account) —— */
@@ -317,15 +444,30 @@
   function updateHeroCta() {
     const row = $("#heroCtaRow");
     if (!row) return;
+    const pilatesBtn = `<button type="button" class="btn pilates-cta" data-open-pilates>女士 · 普拉提</button>`;
+    const mapBtn = `<button type="button" class="btn ghost" data-view-jump="bodymap">全身肌肉圖</button>`;
     if (isLoggedIn()) {
       row.innerHTML = `
         <button type="button" class="btn primary" data-view-jump="log">去記今日訓練</button>
-        <button type="button" class="btn ghost" data-view-jump="shorts">睇圖解目錄</button>`;
+        ${pilatesBtn}
+        ${mapBtn}
+        <button type="button" class="btn ghost" data-view-jump="goals">目標／營養</button>`;
     } else {
       row.innerHTML = `
         <button type="button" class="btn primary" data-open-auth data-auth-tab="register">註冊／登入</button>
-        <button type="button" class="btn ghost" data-view-jump="shorts">睇圖解目錄</button>`;
+        ${pilatesBtn}
+        ${mapBtn}
+        <button type="button" class="btn ghost" data-view-jump="goals">目標／營養</button>`;
     }
+  }
+
+  function openPilatesCatalog() {
+    state.catalogMode = "all";
+    state.catalogCategory = "pilates";
+    showView("shorts");
+    const grid = $("#dayGrid");
+    if (grid) grid.scrollIntoView({ behavior: "smooth", block: "start" });
+    toast("已篩選：普拉提 · 女士");
   }
 
   function setAuthError(id, msg) {
@@ -389,6 +531,7 @@
     updateAccountChip();
     toast("歡迎返嚟，" + (res.user.displayName || res.user.username));
     if (state.view === "log") renderLog();
+    if (state.view === "goals") renderGoalsPage();
   }
 
   async function onRegisterSubmit(ev) {
@@ -413,6 +556,7 @@
     updateAccountChip();
     toast("註冊成功，已登入");
     if (state.view === "log") renderLog();
+    if (state.view === "goals") renderGoalsPage();
   }
 
   function loadVideos() {
@@ -455,7 +599,8 @@
       : "";
     const player = bundled
       ? `<div class="bundled-video">
-          <video controls playsinline loop muted poster="${escapeAttr(bundled.poster)}?v=${CACHE}" src="${escapeAttr(bundled.src)}?v=${CACHE}"></video>
+          <video controls playsinline loop muted poster="${escapeAttr(resolvePoster(bundled).src)}?v=${CACHE}" src="${escapeAttr(bundled.src)}?v=${CACHE}"></video>
+          ${resolvePoster(bundled).isFallback && getVisualGender() === "female" ? '<p class="poster-fallback-note">此動作暫用通用圖</p>' : ""}
           <p class="video-caption">解剖圖解示意短片（非真人）</p>
         </div>`
       : `<div class="video-placeholder">
@@ -531,6 +676,10 @@
       closeDetail();
       renderShorts();
     }
+    if (name === "goals") {
+      closeDetail();
+      renderGoalsPage();
+    }
     if (name === "log") renderLog();
   }
 
@@ -584,10 +733,14 @@
       q === "reformer" ||
       q === "核心穩定" ||
       q === "女士拉根" ||
+      q === "女士" ||
+      q === "女士普拉提" ||
+      q === "女仔普拉提" ||
       q.includes("普拉提") ||
       q.includes("拉根") ||
       q.includes("reformer") ||
-      q.includes("pilates")
+      q.includes("pilates") ||
+      q.includes("女士普拉")
     ) {
       return { ids: ["core", "glutes", "legs", "back", "shoulders"], full: false, unknown: false, category: "pilates" };
     }
@@ -794,7 +947,7 @@
       return;
     }
 
-    const frames = muscleMap.FRAMES || [];
+    const frames = bodyMapFrames();
     if (!frames.length) {
       stage.innerHTML = `<p class="empty">解剖圖幀未載入。</p>`;
       return;
@@ -803,7 +956,7 @@
     let fi = typeof state.bodymapFrame === "number" ? state.bodymapFrame : 0;
     fi = ((fi % frames.length) + frames.length) % frames.length;
     state.bodymapFrame = fi;
-    const frame = muscleMap.frameAt(fi);
+    const frame = frames[fi];
     state.bodymapSide = muscleMap.sideFromFrame(frame);
 
     $$("[data-bodymap-side]").forEach((b) => {
@@ -825,7 +978,7 @@
     stage.innerHTML = `
       <div class="bodymap-turntable" id="bodymapTurntable" role="img" aria-label="可拖曳旋轉嘅解剖全身圖 · 而家：${escapeAttr(degLabel)}">
         <div class="bodymap-frame-wrap">
-          <img class="bodymap-frame-img" src="${escapeAttr(frame.src)}?v=20261029f" alt="解剖全身圖 · ${escapeAttr(degLabel)}" draggable="false" width="864" height="1152" />
+          <img class="bodymap-frame-img" src="${escapeAttr(frame.src)}?v=${CACHE}" alt="解剖全身圖 · ${escapeAttr(degLabel)}" draggable="false" width="864" height="1152" />
           ${overlay ? `<div class="bodymap-overlay-layer${hotspotSide ? "" : " is-dim"}">${overlay}</div>` : `<div class="bodymap-overlay-layer is-dim" aria-hidden="true"></div>`}
         </div>
         <p class="bodymap-drag-hint" aria-hidden="true">↔ 左右拖曳旋轉 · 撳橙色區睇介紹</p>
@@ -902,19 +1055,19 @@
 
   function applyBodyMapFrameOnly() {
     if (!muscleMap) return;
-    const frames = muscleMap.FRAMES || [];
+    const frames = bodyMapFrames();
     if (!frames.length) return;
     let fi = typeof state.bodymapFrame === "number" ? state.bodymapFrame : 0;
     fi = ((fi % frames.length) + frames.length) % frames.length;
     state.bodymapFrame = fi;
-    const frame = muscleMap.frameAt(fi);
+    const frame = frames[fi];
     state.bodymapSide = muscleMap.sideFromFrame(frame);
     const img = document.querySelector(".bodymap-frame-img");
     const overlay = document.querySelector(".bodymap-overlay-layer");
     const angle = document.querySelector(".bodymap-angle-label");
     const tt = document.querySelector("#bodymapTurntable");
     if (img) {
-      const src = frame.src + "?v=20261029f";
+      const src = frame.src + "?v=" + CACHE;
       const file = frame.src.split("/").pop();
       if (!img.getAttribute("src") || !img.getAttribute("src").includes(file)) {
         img.src = src;
@@ -959,7 +1112,7 @@
       _bodymapDragAbort.abort();
       _bodymapDragAbort = null;
     }
-    const frames = muscleMap.FRAMES || [];
+    const frames = bodyMapFrames();
     if (!frames.length) return;
     const ac = new AbortController();
     _bodymapDragAbort = ac;
@@ -1200,7 +1353,7 @@
             : state.catalogCategory === "home"
               ? " · 家用"
               : state.catalogCategory === "pilates"
-                ? " · 普拉提"
+                ? " · 普拉提 · 女士"
                 : "";
       countEl.textContent = modeLabel + catLabelText + " · " + entries.length + " 款";
     }
@@ -1208,18 +1361,30 @@
       grid.innerHTML = `<p class="empty">呢個篩選未有圖解。試吓換「全部圖解」或清類別篩選。</p>`;
       return;
     }
+    // 女圖偏好時普拉提排前，方便女士揾
+    if (getVisualGender() === "female" && !state.catalogCategory && state.catalogMode === "all") {
+      entries = entries.slice().sort((a, b) => {
+        const ap = a.ex.category === "pilates" ? 0 : 1;
+        const bp = b.ex.category === "pilates" ? 0 : 1;
+        return ap - bp;
+      });
+    }
     grid.innerHTML = entries
       .map(({ ex, badge, key }) => {
         const bundled = getBundledVideo(ex.id);
-        const poster = bundled ? bundled.poster + "?v=" + CACHE : "";
+        const resolved = resolvePoster(bundled);
+        const poster = resolved.src ? resolved.src + "?v=" + CACHE : "";
         const shortName = ex.name.length > 16 ? ex.name.slice(0, 15) + "…" : ex.name;
+        const fallback = resolved.isFallback && getVisualGender() === "female"
+          ? `<span class="poster-fallback-pill">暫用通用圖</span>`
+          : "";
         const img = poster
           ? `<img class="poster-img" src="${escapeAttr(poster)}" alt="" loading="lazy" decoding="async" />`
           : `<div class="day-fig">${figureHtml(ex)}</div>`;
         return `
         <button type="button" class="poster-card" data-open-ex-shorts="${ex.id}" data-catalog-key="${key}" aria-label="${escapeAttr(ex.name)}：撳入教學">
           <span class="poster-badge">${badge}</span>
-          <div class="poster-media">${img}</div>
+          <div class="poster-media">${img}${fallback}</div>
           <div class="poster-name">${escapeHtml(shortName)}</div>
         </button>`;
       })
@@ -1519,9 +1684,9 @@
           "</span> " +
           tags +
           "</p></div>" +
-          '<button type="button" class="icon-btn" data-del-log="' +
+          '<button type="button" class="btn ghost danger-btn" data-del-log="' +
           escapeAttr(l.id) +
-          '" aria-label="刪除記錄">🗑</button></div>' +
+          '" aria-label="刪除記錄">刪除</button></div>' +
           '<p class="log-sets"><strong>' +
           l.sets +
           "</strong> 組 × <strong>" +
@@ -1536,6 +1701,203 @@
         );
       })
       .join("");
+  }
+
+
+  function targetLabel(t) {
+    if (t === "fatLoss") return "減脂";
+    if (t === "muscleGain") return "增肌";
+    return "維持";
+  }
+
+  function readGoalsForm() {
+    return {
+      sex: ($("#goalSex") && $("#goalSex").value) || "female",
+      age: Number(($("#goalAge") && $("#goalAge").value) || 0),
+      heightCm: Number(($("#goalHeight") && $("#goalHeight").value) || 0),
+      weightKg: Number(($("#goalWeight") && $("#goalWeight").value) || 0),
+      activity: Number(($("#goalActivity") && $("#goalActivity").value) || 1.375),
+      target: ($("#goalTarget") && $("#goalTarget").value) || "fatLoss"
+    };
+  }
+
+  function runGoalsCalc(ev) {
+    if (ev) ev.preventDefault();
+    const input = readGoalsForm();
+    if (!input.age || !input.heightCm || !input.weightKg) {
+      toast("請填齊年齡、身高、體重");
+      return;
+    }
+    const { bmr, tdee } = calcMifflin(input.sex, input.age, input.heightCm, input.weightKg, input.activity);
+    const range = calorieRangeForTarget(tdee, input.target);
+    const meals = mealPlansFor(input.target);
+    if (!state.selectedMealId || !meals.some((m) => m.id === state.selectedMealId)) {
+      state.selectedMealId = meals[0] ? meals[0].id : null;
+    }
+    state.lastGoalCalc = {
+      input,
+      bmr,
+      tdee,
+      range,
+      mealId: state.selectedMealId,
+      at: new Date().toISOString()
+    };
+    renderGoalsResult();
+  }
+
+  function renderGoalsResult() {
+    const box = $("#goalsResult");
+    if (!box) return;
+    const calc = state.lastGoalCalc;
+    if (!calc) {
+      box.hidden = true;
+      box.innerHTML = "";
+      return;
+    }
+    const { input, bmr, tdee, range } = calc;
+    const meals = mealPlansFor(input.target);
+    const selected = meals.find((m) => m.id === state.selectedMealId) || meals[0];
+    const moves = suggestMovesForGoal(input.target, input.sex);
+    const mealTabs = meals
+      .map(
+        (m) =>
+          `<button type="button" class="catalog-chip${selected && selected.id === m.id ? " active" : ""}" data-select-meal="${escapeAttr(m.id)}">${escapeHtml(m.title)}</button>`
+      )
+      .join("");
+    const mealBody = selected
+      ? `<div class="meal-card">
+          <h4>${escapeHtml(selected.title)}</h4>
+          <ul class="plain-list">${selected.meals
+            .map((x) => `<li><strong>${escapeHtml(x.name)}：</strong>${escapeHtml(x.items)}</li>`)
+            .join("")}</ul>
+          <p class="muted tiny">${escapeHtml(selected.proteinNote || "")}</p>
+        </div>`
+      : "<p class=\"empty\">暫無餐單模板</p>";
+    const moveChips = moves
+      .map(
+        (ex) =>
+          `<button type="button" class="mini-chip" data-open-ex="${ex.id}">${ex.emoji || ""} ${escapeHtml(ex.name)}</button>`
+      )
+      .join("");
+    box.hidden = false;
+    box.innerHTML = `
+      <h3 class="section-label">粗估結果 · ${escapeHtml(targetLabel(input.target))}</h3>
+      <div class="goals-stats">
+        <div class="stat-pill"><span class="stat-k">BMR</span><span class="stat-v">${bmr}</span><span class="stat-u">kcal／日</span></div>
+        <div class="stat-pill"><span class="stat-k">TDEE</span><span class="stat-v">${tdee}</span><span class="stat-u">kcal／日</span></div>
+        <div class="stat-pill wide"><span class="stat-k">${escapeHtml(range.label)}</span><span class="stat-v">${range.low}–${range.high}</span><span class="stat-u">kcal／日（範圍）</span></div>
+      </div>
+      <p class="disclaimer compact-disc"><strong>聲明：</strong>以上為 Mifflin-St Jeor 粗估，因人而異，唔係醫療建議，亦唔保證減脂／增肌效果。懷孕、傷患、飲食限制請咨詢專業人士。</p>
+      <h3 class="section-label">粵語營養餐示例</h3>
+      <div class="catalog-chip-row thin">${mealTabs}</div>
+      ${mealBody}
+      <h3 class="section-label">可配合動作（示意）</h3>
+      <div class="mini-row">${moveChips || "<span class=\"muted tiny\">—</span>"}</div>
+      ${
+        input.sex === "female" && input.target === "fatLoss"
+          ? '<p class="muted tiny">女士減脂可多睇「女士 · 普拉提」同有氧；撳頂欄或首頁 CTA 即到。</p>'
+          : ""
+      }
+    `;
+  }
+
+  function saveCurrentGoalSnapshot() {
+    if (!state.lastGoalCalc) {
+      runGoalsCalc();
+    }
+    if (!state.lastGoalCalc) {
+      toast("請先試算");
+      return;
+    }
+    const calc = state.lastGoalCalc;
+    const snap = {
+      id: uid(),
+      date: todayStr(),
+      createdAt: new Date().toISOString(),
+      input: calc.input,
+      bmr: calc.bmr,
+      tdee: calc.tdee,
+      range: calc.range,
+      mealId: state.selectedMealId || calc.mealId,
+      summary:
+        targetLabel(calc.input.target) +
+        " · BMR " +
+        calc.bmr +
+        " · TDEE " +
+        calc.tdee +
+        " · 建議 " +
+        calc.range.low +
+        "–" +
+        calc.range.high +
+        " kcal"
+    };
+    const list = loadGoalSnapshots();
+    list.unshift(snap);
+    saveGoalSnapshots(list);
+    renderGoalsSavedList();
+    toast("已儲存分析快照");
+  }
+
+  function deleteGoalSnapshot(id) {
+    const list = loadGoalSnapshots().filter((x) => x.id !== id);
+    saveGoalSnapshots(list);
+    renderGoalsSavedList();
+    toast("已刪除快照");
+  }
+
+  function renderGoalsSavedList() {
+    const el = $("#goalsSavedList");
+    if (!el) return;
+    const list = loadGoalSnapshots();
+    const hint = $("#goalSaveHint");
+    if (hint) {
+      hint.textContent = isLoggedIn()
+        ? "已登入：快照存於 " + goalsStorageKey()
+        : "訪客快照：fitnessCoachLite.goals.v1.guest · 登入後用個人鍵";
+    }
+    if (!list.length) {
+      el.innerHTML = '<p class="empty">未有儲存快照。試算後撳「儲存呢次分析」。</p>';
+      return;
+    }
+    el.innerHTML = list
+      .map((s) => {
+        const meal = (mealPlansFor((s.input && s.input.target) || "maintain") || []).find(
+          (m) => m.id === s.mealId
+        );
+        return (
+          '<article class="card log-card">' +
+          '<div class="log-top"><div>' +
+          "<h3>" +
+          escapeHtml(s.summary || "分析快照") +
+          "</h3>" +
+          '<p class="muted tiny">' +
+          escapeHtml(s.date || "") +
+          (meal ? " · 餐單：" + escapeHtml(meal.title) : "") +
+          "</p></div>" +
+          '<button type="button" class="btn ghost danger-btn" data-del-goal="' +
+          escapeAttr(s.id) +
+          '" aria-label="刪除快照">刪除</button></div>' +
+          '<p class="muted tiny">' +
+          escapeHtml(
+            "輸入：" +
+              ((s.input && s.input.sex) === "male" ? "男" : "女") +
+              " · " +
+              (s.input && s.input.age) +
+              " 歲 · " +
+              (s.input && s.input.heightCm) +
+              " cm · " +
+              (s.input && s.input.weightKg) +
+              " kg"
+          ) +
+          "</p></article>"
+        );
+      })
+      .join("");
+  }
+
+  function renderGoalsPage() {
+    renderGoalsSavedList();
+    if (state.lastGoalCalc) renderGoalsResult();
   }
 
   function escapeHtml(s) {
@@ -1641,6 +2003,7 @@
       updateAccountChip();
       toast("已登出");
       if (state.view === "log") renderLog();
+      if (state.view === "goals") renderGoalsPage();
       return;
     }
     if (ev.target.id === "migrateLegacyBtn") {
@@ -1733,7 +2096,11 @@
     if (goalChip) {
       const id = goalChip.dataset.goalChip;
       const label =
-        id === "full" ? "全身" : id === "pilates" ? "普拉提" : ((data.muscles.find((x) => x.id === id) || {}).name || id);
+        id === "full"
+          ? "全身"
+          : id === "pilates"
+            ? "普拉提"
+            : (data.muscles.find((x) => x.id === id) || {}).name || id;
       state.goalQuery = label;
       const onMoves = state.view === "moves";
       if (!onMoves && state.view !== "muscles") showView("muscles");
@@ -1763,7 +2130,7 @@
       const side = act === "back" ? "back" : "front";
       state.bodymapSide = side;
       if (muscleMap && muscleMap.indexForSide) {
-        state.bodymapFrame = muscleMap.indexForSide(side);
+        state.bodymapFrame = muscleMap.indexForSide(side, getVisualGender() === "female" ? "female" : "male");
       }
       const cur = state.bodymapRegion && muscleMap ? muscleMap.byId(state.bodymapRegion) : null;
       if (cur && cur.side !== "both" && cur.side !== state.bodymapSide) {
@@ -1798,14 +2165,43 @@
       if (ld) ld.value = "";
       if (lm) lm.value = "";
       renderLog();
+      return;
+    }
+    const genderBtn = ev.target.closest("[data-visual-gender]");
+    if (genderBtn) {
+      setVisualGender(genderBtn.dataset.visualGender);
+      return;
+    }
+    if (ev.target.closest("[data-open-pilates]")) {
+      openPilatesCatalog();
+      return;
+    }
+    const selMeal = ev.target.closest("[data-select-meal]");
+    if (selMeal) {
+      state.selectedMealId = selMeal.dataset.selectMeal;
+      if (state.lastGoalCalc) state.lastGoalCalc.mealId = state.selectedMealId;
+      renderGoalsResult();
+      return;
+    }
+    if (ev.target.id === "goalSaveBtn") {
+      saveCurrentGoalSnapshot();
+      return;
+    }
+    const delGoal = ev.target.closest("[data-del-goal]");
+    if (delGoal) {
+      if (confirm("確定刪除呢筆分析快照？")) deleteGoalSnapshot(delGoal.dataset.delGoal);
+      return;
     }
   }
 
   function preloadBodyMapFrames() {
-    if (!muscleMap || !muscleMap.FRAMES) return;
-    muscleMap.FRAMES.forEach((f) => {
+    if (!muscleMap) return;
+    const all = []
+      .concat((muscleMap.FRAMES_MALE || muscleMap.FRAMES || []))
+      .concat(muscleMap.FRAMES_FEMALE || []);
+    all.forEach((f) => {
       const im = new Image();
-      im.src = f.src + "?v=20261029f";
+      im.src = f.src + "?v=" + CACHE;
     });
   }
 
@@ -1849,10 +2245,15 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    const prefs = loadPrefs();
+    state.visualGender = prefs.visualGender || "neutral";
+    syncGenderChips();
     bindFilters();
     bindGoalSearch();
     preloadBodyMapFrames();
     document.addEventListener("click", onClick);
+    const goalsForm = $("#goalsForm");
+    if (goalsForm) goalsForm.addEventListener("submit", runGoalsCalc);
     document.addEventListener("keydown", (ev) => {
       if (ev.key !== "Enter" && ev.key !== " ") return;
       const hs = ev.target.closest && ev.target.closest("[data-muscle-hotspot]");
