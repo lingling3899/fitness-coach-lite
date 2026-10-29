@@ -6,7 +6,7 @@
   <meta name="description" content="健身教練 Lite：輸入想增肌部位即時建議儀器／動作、每日小 tips、部位教學、短片圖解、本機註冊記進度。示意非醫療，請咨詢專業教練。" />
   <meta name="theme-color" content="#0f1419" />
   <title>健身教練 Lite · 目標部位建議／小 tips／短片／註冊記進度</title>
-  <link rel="stylesheet" href="assets/css/app.css?v=20261029c" />
+  <link rel="stylesheet" href="assets/css/app.css?v=20261029d" />
 </head>
 <body>
   <header class="topbar">
@@ -16,7 +16,7 @@
           <div class="brand-mark" aria-hidden="true">💪</div>
           <div class="brand-text">
             <h1>健身教練 Lite</h1>
-            <p>部位　｜　儀器／動作　｜　圖解目錄　｜　記錄　｜　說明</p>
+            <p>部位　｜　肌肉圖　｜　儀器／動作　｜　圖解目錄　｜　記錄　｜　說明</p>
           </div>
         </div>
         <div id="accountChip" class="account-chip" aria-live="polite">
@@ -25,6 +25,7 @@
       </div>
       <nav class="nav-tabs" aria-label="主要分頁">
         <button type="button" class="active" data-view="muscles">部位教學</button>
+        <button type="button" data-view="bodymap">肌肉圖</button>
         <button type="button" data-view="moves">儀器／動作</button>
         <button type="button" data-view="shorts">圖解目錄</button>
         <button type="button" data-view="log">訓練記錄</button>
@@ -43,6 +44,7 @@
         <p class="lead hero-lead">今日想練邊度？登入記進度，跟住小 tips 練得穩陣啲。撳下面部位，或自己輸入例如「胸」「腿」「二頭」。</p>
         <div class="hero-cta-row" id="heroCtaRow">
           <button type="button" class="btn primary" data-open-auth data-auth-tab="register">註冊／登入</button>
+          <button type="button" class="btn ghost" data-view-jump="bodymap">全身肌肉圖</button>
           <button type="button" class="btn ghost" data-view-jump="shorts">睇圖解目錄</button>
         </div>
         <div class="goal-box">
@@ -67,6 +69,30 @@
         <p class="lead compact">撳卡睇 tip，或用上面搜尋即時拎建議。</p>
       </div>
       <div id="muscleGrid" class="grid" aria-live="polite"></div>
+    </section>
+
+
+    <!-- 全身肌肉圖 -->
+    <section id="view-bodymap" class="view" aria-labelledby="bodymap-title">
+      <div class="panel bodymap-hero">
+        <h2 id="bodymap-title">全身肌肉圖</h2>
+        <p class="lead">撳圖上色塊，睇肌名（中文＋拉丁／英文）、簡介、一般飲食靈感，同本站相關動作。示意分區，非真人解剖／非醫療診斷。</p>
+        <div class="bodymap-toolbar" role="toolbar" aria-label="正面或背面">
+          <button type="button" class="catalog-chip active" data-bodymap-side="front" aria-pressed="true">正面</button>
+          <button type="button" class="catalog-chip" data-bodymap-side="back" aria-pressed="false">背面</button>
+        </div>
+      </div>
+      <div class="bodymap-layout">
+        <div class="bodymap-stage panel" id="bodymapStage" aria-live="polite"></div>
+        <div class="bodymap-info panel" id="bodymapInfo">
+          <p class="muted">撳左圖（或上圖）肌肉色塊開始。</p>
+        </div>
+      </div>
+      <div class="panel soft-panel">
+        <h3 class="section-label">本面肌群一覽</h3>
+        <div class="bodymap-chip-row" id="bodymapChips" role="list"></div>
+        <p class="disclaimer compact-disc"><strong>飲食聲明：</strong>以下為一般飲食參考，因人而異；有需要請咨詢註冊營養師／醫生。唔係醫療建議，亦唔治療任何疾病。</p>
+      </div>
     </section>
 
     <!-- 儀器／動作 -->
@@ -169,12 +195,13 @@
     <section id="view-about" class="view" aria-labelledby="about-title">
       <div class="panel">
         <h2 id="about-title">關於健身教練 Lite</h2>
-        <p class="lead">靜態精簡版：輸入想增肌部位即時建議儀器／動作、每日小 tips、部位教練提示、健身房／有氧／家用動作教學、圖解目錄（全部海報＋21 日挑戰）、本機註冊／登入同個人訓練日誌。手機同桌面版面已調校易讀（觸控目標、字級、行長、詳情左右欄）。適合快速查同記，唔取代真人教練。</p>
+        <p class="lead">靜態精簡版：輸入想增肌部位即時建議儀器／動作、每日小 tips、部位教練提示、<strong>全身肌肉圖</strong>（肌名＋一般飲食靈感）、健身房／有氧／家用動作教學、圖解目錄（全部海報＋21 日挑戰）、本機註冊／登入同個人訓練日誌。手機同桌面版面已調校易讀。適合快速查同記，唔取代真人教練。</p>
         <p id="aboutStats" class="count"></p>
         <ul class="about-list">
           <li><strong>目標搜尋</strong>：輸入或撳胸／背／肩／手臂／腿／核心／臀／全身，即時分「健身房儀器」同「家用／徒手／啞鈴」建議。</li>
           <li><strong>今日小 tips</strong>：熱身、呼吸、溫柔進階、恢復等短提示（示意，非醫療）。</li>
           <li><strong>部位教學</strong>：胸、背、肩、手臂、腿、臀、核心 — 短提示＋推薦動作。</li>
+          <li><strong>肌肉圖</strong>：正面／背面示意全身圖，標胸大肌、三角肌、二頭／三頭、腹、闊背、斜方／菱形、豎脊、臀、股四、腘繩、小腿、髖屈、內收等；撳色塊睇簡介、一般飲食靈感同相關動作（非醫療／非處方）。</li>
           <li><strong>儀器／動作</strong>：健身房常見器械同家用徒手／啞鈴各精簡數款；含步驟、常見錯誤、新手組數參考。</li>
           <li><strong>圖解目錄</strong>：全部 35 款解剖海報上下滑瀏覽（2–3 欄金邊卡）；撳卡即入教學同短片。可切「全部圖解／21 日挑戰」同「健身房／有氧／家用」篩選。詳情含錯誤／正確姿勢示意、肌群高亮。<strong>內建 35 款解剖圖解示意短片</strong>（原有 21 款＋哈克深蹲、垂直腿舉、腿彎曲、抬腿訓練器、腹肌訓練機、側平舉機、助力引體向上、直臂下壓、上斜推胸；有氧：跑步機、橢圓機、直立單車、靠背單車、樓梯機；非真人、非抄品牌）；其餘可自備 YouTube 連結（本機儲存）。版面為示意圖解，非抄襲他牌。</li>
           <li><strong>註冊／登入</strong>：本機多帳戶（瀏覽器 localStorage），每人自己一套訓練日誌；唔上雲、唔同步其他裝置。</li>
@@ -187,7 +214,7 @@
       </div>
       <div class="panel">
         <h3>版本</h3>
-        <p class="muted tiny">fitness-coach-lite · ?v=20261029c · GitHub Pages</p>
+        <p class="muted tiny">fitness-coach-lite · ?v=20261029d · GitHub Pages</p>
       </div>
     </section>
   </main>
@@ -297,8 +324,9 @@
     </div>
   </div>
 
-  <script src="assets/js/data.js?v=20261029c"></script>
-  <script src="assets/js/anatomy.js?v=20261029c"></script>
-  <script src="assets/js/app.js?v=20261029c"></script>
+  <script src="assets/js/data.js?v=20261029d"></script>
+  <script src="assets/js/anatomy.js?v=20261029d"></script>
+  <script src="assets/js/muscle-map.js?v=20261029d"></script>
+  <script src="assets/js/app.js?v=20261029d"></script>
 </body>
 </html>

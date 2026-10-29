@@ -6,7 +6,7 @@
   const VIDEO_KEY = "fitnessCoachLite.videos.v1";
   const USERS_KEY = "fitnessCoachLite.users.v1";
   const SESSION_KEY = "fitnessCoachLite.session.v1";
-  const CACHE = "20261029c";
+  const CACHE = "20261029d";
   const BUNDLED_VIDEOS = {
     "db-row": { src: "assets/videos/db-row.mp4", poster: "assets/videos/db-row.jpg" },
     "db-shoulder-press": { src: "assets/videos/db-shoulder-press.mp4", poster: "assets/videos/db-shoulder-press.jpg" },
@@ -46,6 +46,7 @@
   };
   const data = window.FITNESS_DATA;
   const anatomy = window.FITNESS_ANATOMY;
+  const muscleMap = window.FITNESS_MUSCLE_MAP;
   if (!data) {
     console.error("FITNESS_DATA missing");
     return;
@@ -66,7 +67,9 @@
     goalQuery: "",
     tipIndex: 0,
     catalogMode: "all",
-    catalogCategory: ""
+    catalogCategory: "",
+    bodymapSide: "front",
+    bodymapRegion: null
   };
 
   const GOAL_CHIPS = [
@@ -501,6 +504,10 @@
       v.classList.toggle("active", v.id === "view-" + name);
     });
     if (name === "muscles") renderMuscles();
+    if (name === "bodymap") {
+      closeDetail();
+      renderBodyMap();
+    }
     if (name === "moves") {
       closeDetail();
       renderMoves();
@@ -726,6 +733,104 @@
     const b = $("#goalChipsMoves");
     if (a) a.innerHTML = html;
     if (b) b.innerHTML = html;
+  }
+
+
+  function renderBodyMap() {
+    const stage = $("#bodymapStage");
+    const info = $("#bodymapInfo");
+    const chips = $("#bodymapChips");
+    if (!stage || !muscleMap) {
+      if (stage) stage.innerHTML = `<p class="empty">肌肉圖資料未載入。</p>`;
+      return;
+    }
+    const side = state.bodymapSide === "back" ? "back" : "front";
+    state.bodymapSide = side;
+    $$("[data-bodymap-side]").forEach((b) => {
+      const on = b.dataset.bodymapSide === side;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+
+    const selected = state.bodymapRegion;
+    stage.innerHTML =
+      `<div class="bodymap-svg-wrap">` +
+      (side === "back" ? muscleMap.backSvg(selected) : muscleMap.frontSvg(selected)) +
+      `</div>`;
+
+    const list = muscleMap.listForSide(side);
+    if (chips) {
+      chips.innerHTML = list
+        .map((r) => {
+          const on = selected === r.id;
+          return `<button type="button" class="bodymap-chip${on ? " active" : ""}" data-muscle-hotspot="${escapeAttr(r.id)}" role="listitem">${escapeHtml(r.name)}</button>`;
+        })
+        .join("");
+    }
+
+    if (!info) return;
+    const region = selected ? muscleMap.byId(selected) : null;
+    if (!region) {
+      info.innerHTML = `
+        <h3 class="bodymap-info-title">揀一塊肌</h3>
+        <p class="lead compact">撳圖上橙色可選色塊，或下面名稱。會顯示肌名、簡介、一般飲食靈感，同可跳去嘅相關動作。</p>
+        <p class="disclaimer compact-disc"><strong>飲食聲明：</strong>一般飲食參考，因人而異；有需要請咨詢註冊營養師／醫生。</p>`;
+      return;
+    }
+
+    const moves = (region.exerciseIds || [])
+      .map(byId)
+      .filter(Boolean)
+      .slice(0, 8);
+    const moveBtns = moves
+      .map(
+        (ex) =>
+          `<button type="button" class="mini-chip" data-open-ex="${ex.id}">${ex.emoji} ${escapeHtml(ex.name)}</button>`
+      )
+      .join("");
+    const foods = (region.foods || [])
+      .map((f) => `<li>${escapeHtml(f)}</li>`)
+      .join("");
+    const groupLinks = (region.groupIds || [])
+      .map((gid) => {
+        const m = data.muscles.find((x) => x.id === gid);
+        if (!m) return "";
+        return `<button type="button" class="btn ghost" data-goto-moves="${m.id}">部位：${escapeHtml(m.name)}</button>`;
+      })
+      .filter(Boolean)
+      .join("");
+
+    info.innerHTML = `
+      <p class="bodymap-kicker">${side === "back" ? "背面" : "正面"}</p>
+      <h3 class="bodymap-info-title">${escapeHtml(region.name)}</h3>
+      <p class="muted tiny bodymap-latin">${escapeHtml(region.latin)}</p>
+      <p class="coach-tip">${escapeHtml(region.blurb)}</p>
+      <div class="bodymap-nutri">
+        <h4>飲食靈感（一般參考）</h4>
+        <p>${escapeHtml(region.nutrition)}</p>
+        <ul class="plain-list nutri-foods">${foods}</ul>
+        <p class="disclaimer compact-disc"><strong>聲明：</strong>一般飲食參考，因人而異；有需要請咨詢註冊營養師／醫生。非醫療建議、非治療宣稱。</p>
+      </div>
+      <div class="bodymap-moves">
+        <h4>相關動作（本站）</h4>
+        <div class="mini-row">${moveBtns || `<span class="muted tiny">暫無直接連結</span>`}</div>
+        <div class="btn-row" style="margin-top:10px">${groupLinks}</div>
+      </div>`;
+  }
+
+  function selectBodyMapRegion(id) {
+    if (!muscleMap || !muscleMap.byId(id)) return;
+    state.bodymapRegion = id;
+    const region = muscleMap.byId(id);
+    if (region.side === "front" || region.side === "back") {
+      // keep current side if region is "both"; else switch to region's side
+      if (region.side !== "both") state.bodymapSide = region.side;
+    }
+    renderBodyMap();
+    const info = $("#bodymapInfo");
+    if (info && window.matchMedia && window.matchMedia("(max-width: 899px)").matches) {
+      info.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
   }
 
   function renderMuscles() {
@@ -1430,6 +1535,23 @@
       nextDailyTip();
       return;
     }
+    const bodymapSideBtn = ev.target.closest("[data-bodymap-side]");
+    if (bodymapSideBtn) {
+      state.bodymapSide = bodymapSideBtn.dataset.bodymapSide === "back" ? "back" : "front";
+      // clear selection if not visible on new side? keep selection for "both"
+      const cur = state.bodymapRegion && muscleMap ? muscleMap.byId(state.bodymapRegion) : null;
+      if (cur && cur.side !== "both" && cur.side !== state.bodymapSide) {
+        state.bodymapRegion = null;
+      }
+      renderBodyMap();
+      return;
+    }
+    const hotspot = ev.target.closest("[data-muscle-hotspot]");
+    if (hotspot) {
+      selectBodyMapRegion(hotspot.dataset.muscleHotspot);
+      if (state.view !== "bodymap") showView("bodymap");
+      return;
+    }
     const catalogModeBtn = ev.target.closest("[data-catalog-mode]");
     if (catalogModeBtn) {
       state.catalogMode = catalogModeBtn.dataset.catalogMode || "all";
@@ -1461,7 +1583,8 @@
     const el = $("#aboutStats");
     if (el) {
       const vids = Object.keys(BUNDLED_VIDEOS).length;
-      el.textContent = `而家收錄：健身房器械 ${gym} 款 · 有氧 ${cardio} 款 · 家用／徒手／啞鈴 ${home} 款 · 部位 ${data.muscles.length} 個 · 挑戰 ${days} 日 · 內建解剖短片 ${vids} 款`;
+      const mapN = (muscleMap && muscleMap.regions && muscleMap.regions.length) || 0;
+      el.textContent = `而家收錄：健身房器械 ${gym} 款 · 有氧 ${cardio} 款 · 家用／徒手／啞鈴 ${home} 款 · 部位 ${data.muscles.length} 個 · 肌肉圖分區 ${mapN} · 挑戰 ${days} 日 · 內建解剖短片 ${vids} 款`;
     }
   }
 
@@ -1494,6 +1617,14 @@
     bindFilters();
     bindGoalSearch();
     document.addEventListener("click", onClick);
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key !== "Enter" && ev.key !== " ") return;
+      const hs = ev.target.closest && ev.target.closest("[data-muscle-hotspot]");
+      if (!hs) return;
+      ev.preventDefault();
+      selectBodyMapRegion(hs.dataset.muscleHotspot);
+      if (state.view !== "bodymap") showView("bodymap");
+    });
     const form = $("#logForm");
     if (form) form.addEventListener("submit", submitQuickLog);
     const loginForm = $("#authLoginForm");
