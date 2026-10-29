@@ -69,6 +69,7 @@
     catalogMode: "all",
     catalogCategory: "",
     bodymapSide: "front",
+    bodymapFrame: 0,
     bodymapRegion: null
   };
 
@@ -744,21 +745,51 @@
       if (stage) stage.innerHTML = `<p class="empty">肌肉圖資料未載入。</p>`;
       return;
     }
-    const side = state.bodymapSide === "back" ? "back" : "front";
-    state.bodymapSide = side;
+
+    const frames = muscleMap.FRAMES || [];
+    if (!frames.length) {
+      stage.innerHTML = `<p class="empty">解剖圖幀未載入。</p>`;
+      return;
+    }
+
+    let fi = typeof state.bodymapFrame === "number" ? state.bodymapFrame : 0;
+    fi = ((fi % frames.length) + frames.length) % frames.length;
+    state.bodymapFrame = fi;
+    const frame = muscleMap.frameAt(fi);
+    state.bodymapSide = muscleMap.sideFromFrame(frame);
+
     $$("[data-bodymap-side]").forEach((b) => {
-      const on = b.dataset.bodymapSide === side;
-      b.classList.toggle("active", on);
-      b.setAttribute("aria-pressed", on ? "true" : "false");
+      const side = b.dataset.bodymapSide;
+      if (side === "front" || side === "back") {
+        const on = side === state.bodymapSide;
+        b.classList.toggle("active", on);
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+      }
     });
 
     const selected = state.bodymapRegion;
-    stage.innerHTML =
-      `<div class="bodymap-svg-wrap">` +
-      (side === "back" ? muscleMap.backSvg(selected) : muscleMap.frontSvg(selected)) +
-      `</div>`;
+    const hotspotSide = frame.hotspot; // 'front' | 'back' | null
+    let overlay = "";
+    if (hotspotSide === "front") overlay = muscleMap.frontOverlaySvg(selected);
+    else if (hotspotSide === "back") overlay = muscleMap.backOverlaySvg(selected);
 
-    const list = muscleMap.listForSide(side);
+    const degLabel = frame.label || "";
+    stage.innerHTML = `
+      <div class="bodymap-turntable" id="bodymapTurntable" role="img" aria-label="可拖曳旋轉嘅解剖全身圖 · 而家：${escapeAttr(degLabel)}">
+        <div class="bodymap-frame-wrap">
+          <img class="bodymap-frame-img" src="${escapeAttr(frame.src)}?v=20261029e" alt="解剖全身圖 · ${escapeAttr(degLabel)}" draggable="false" width="864" height="1152" />
+          ${overlay ? `<div class="bodymap-overlay-layer${hotspotSide ? "" : " is-dim"}">${overlay}</div>` : `<div class="bodymap-overlay-layer is-dim" aria-hidden="true"></div>`}
+        </div>
+        <p class="bodymap-drag-hint" aria-hidden="true">↔ 左右拖曳旋轉 · 撳橙色區睇介紹</p>
+        <p class="bodymap-angle-label"><span>${escapeHtml(degLabel)}</span> · ${fi + 1}/${frames.length}</p>
+      </div>`;
+
+    if (!_bodymapDragging) {
+      bindBodyMapDrag(stage.querySelector("#bodymapTurntable"));
+    }
+
+    const listSide = state.bodymapSide === "back" ? "back" : "front";
+    const list = muscleMap.listForSide(listSide);
     if (chips) {
       chips.innerHTML = list
         .map((r) => {
@@ -773,7 +804,7 @@
     if (!region) {
       info.innerHTML = `
         <h3 class="bodymap-info-title">揀一塊肌</h3>
-        <p class="lead compact">撳圖上橙色可選色塊，或下面名稱。會顯示肌名、簡介、一般飲食靈感，同可跳去嘅相關動作。</p>
+        <p class="lead compact">左右拖曳旋轉解剖全身圖；喺正面／背面可撳肌肉熱點，或下面名稱。會顯示肌名、簡介、一般飲食靈感，同可跳去嘅相關動作。</p>
         <p class="disclaimer compact-disc"><strong>飲食聲明：</strong>一般飲食參考，因人而異；有需要請咨詢註冊營養師／醫生。</p>`;
       return;
     }
@@ -801,7 +832,7 @@
       .join("");
 
     info.innerHTML = `
-      <p class="bodymap-kicker">${side === "back" ? "背面" : "正面"}</p>
+      <p class="bodymap-kicker">${escapeHtml(degLabel)} · ${listSide === "back" ? "背面肌群" : "正面肌群"}</p>
       <h3 class="bodymap-info-title">${escapeHtml(region.name)}</h3>
       <p class="muted tiny bodymap-latin">${escapeHtml(region.latin)}</p>
       <p class="coach-tip">${escapeHtml(region.blurb)}</p>
@@ -818,12 +849,141 @@
       </div>`;
   }
 
+  let _bodymapDragAbort = null;
+  let _bodymapDragging = false;
+
+  function applyBodyMapFrameOnly() {
+    if (!muscleMap) return;
+    const frames = muscleMap.FRAMES || [];
+    if (!frames.length) return;
+    let fi = typeof state.bodymapFrame === "number" ? state.bodymapFrame : 0;
+    fi = ((fi % frames.length) + frames.length) % frames.length;
+    state.bodymapFrame = fi;
+    const frame = muscleMap.frameAt(fi);
+    state.bodymapSide = muscleMap.sideFromFrame(frame);
+    const img = document.querySelector(".bodymap-frame-img");
+    const overlay = document.querySelector(".bodymap-overlay-layer");
+    const angle = document.querySelector(".bodymap-angle-label");
+    const tt = document.querySelector("#bodymapTurntable");
+    if (img) {
+      const src = frame.src + "?v=20261029e";
+      const file = frame.src.split("/").pop();
+      if (!img.getAttribute("src") || !img.getAttribute("src").includes(file)) {
+        img.src = src;
+      }
+      img.alt = "解剖全身圖 · " + (frame.label || "");
+    }
+    if (overlay) {
+      const selected = state.bodymapRegion;
+      if (frame.hotspot === "front") {
+        overlay.classList.remove("is-dim");
+        overlay.innerHTML = muscleMap.frontOverlaySvg(selected);
+        overlay.removeAttribute("aria-hidden");
+      } else if (frame.hotspot === "back") {
+        overlay.classList.remove("is-dim");
+        overlay.innerHTML = muscleMap.backOverlaySvg(selected);
+        overlay.removeAttribute("aria-hidden");
+      } else {
+        overlay.classList.add("is-dim");
+        overlay.innerHTML = "";
+        overlay.setAttribute("aria-hidden", "true");
+      }
+    }
+    if (angle) {
+      angle.innerHTML = `<span>${escapeHtml(frame.label || "")}</span> · ${fi + 1}/${frames.length}`;
+    }
+    if (tt) {
+      tt.setAttribute("aria-label", "可拖曳旋轉嘅解剖全身圖 · 而家：" + (frame.label || ""));
+    }
+    $$("[data-bodymap-side]").forEach((b) => {
+      const side = b.dataset.bodymapSide;
+      if (side === "front" || side === "back") {
+        const on = side === state.bodymapSide;
+        b.classList.toggle("active", on);
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+      }
+    });
+  }
+
+  function bindBodyMapDrag(el) {
+    if (!el || !muscleMap) return;
+    if (_bodymapDragAbort) {
+      _bodymapDragAbort.abort();
+      _bodymapDragAbort = null;
+    }
+    const frames = muscleMap.FRAMES || [];
+    if (!frames.length) return;
+    const ac = new AbortController();
+    _bodymapDragAbort = ac;
+    const sig = { signal: ac.signal };
+    let startX = 0;
+    let acc = 0;
+    const STEP = 40;
+
+    el.addEventListener(
+      "pointerdown",
+      (ev) => {
+        if (ev.target.closest && ev.target.closest("[data-muscle-hotspot]")) return;
+        if (ev.button != null && ev.button !== 0) return;
+        _bodymapDragging = true;
+        acc = 0;
+        startX = ev.clientX;
+        el.classList.add("is-dragging");
+        try {
+          el.setPointerCapture(ev.pointerId);
+        } catch (e) {}
+      },
+      sig
+    );
+    el.addEventListener(
+      "pointermove",
+      (ev) => {
+        if (!_bodymapDragging) return;
+        const dx = ev.clientX - startX;
+        startX = ev.clientX;
+        acc += dx;
+        if (Math.abs(acc) >= STEP) {
+          const steps = Math.trunc(acc / STEP);
+          acc -= steps * STEP;
+          state.bodymapFrame = (state.bodymapFrame || 0) - steps;
+          applyBodyMapFrameOnly();
+        }
+      },
+      sig
+    );
+    function endDrag(ev) {
+      if (!_bodymapDragging) return;
+      _bodymapDragging = false;
+      el.classList.remove("is-dragging");
+      try {
+        if (ev && ev.pointerId != null) el.releasePointerCapture(ev.pointerId);
+      } catch (e) {}
+      // refresh chips/info for side change after spin
+      renderBodyMap();
+    }
+    el.addEventListener("pointerup", endDrag, sig);
+    el.addEventListener("pointercancel", endDrag, sig);
+    el.addEventListener(
+      "lostpointercapture",
+      () => {
+        if (!_bodymapDragging) return;
+        _bodymapDragging = false;
+        el.classList.remove("is-dragging");
+        renderBodyMap();
+      },
+      sig
+    );
+  }
+
   function selectBodyMapRegion(id) {
     if (!muscleMap || !muscleMap.byId(id)) return;
     state.bodymapRegion = id;
     const region = muscleMap.byId(id);
+    const best = muscleMap.bestFrameForRegion(region);
+    if (typeof best === "number" && best >= 0) {
+      state.bodymapFrame = best;
+    }
     if (region.side === "front" || region.side === "back") {
-      // keep current side if region is "both"; else switch to region's side
       if (region.side !== "both") state.bodymapSide = region.side;
     }
     renderBodyMap();
@@ -1537,8 +1697,22 @@
     }
     const bodymapSideBtn = ev.target.closest("[data-bodymap-side]");
     if (bodymapSideBtn) {
-      state.bodymapSide = bodymapSideBtn.dataset.bodymapSide === "back" ? "back" : "front";
-      // clear selection if not visible on new side? keep selection for "both"
+      const act = bodymapSideBtn.dataset.bodymapSide;
+      if (act === "spin-left") {
+        state.bodymapFrame = (state.bodymapFrame || 0) - 1;
+        renderBodyMap();
+        return;
+      }
+      if (act === "spin-right") {
+        state.bodymapFrame = (state.bodymapFrame || 0) + 1;
+        renderBodyMap();
+        return;
+      }
+      const side = act === "back" ? "back" : "front";
+      state.bodymapSide = side;
+      if (muscleMap && muscleMap.indexForSide) {
+        state.bodymapFrame = muscleMap.indexForSide(side);
+      }
       const cur = state.bodymapRegion && muscleMap ? muscleMap.byId(state.bodymapRegion) : null;
       if (cur && cur.side !== "both" && cur.side !== state.bodymapSide) {
         state.bodymapRegion = null;
@@ -1573,6 +1747,14 @@
       if (lm) lm.value = "";
       renderLog();
     }
+  }
+
+  function preloadBodyMapFrames() {
+    if (!muscleMap || !muscleMap.FRAMES) return;
+    muscleMap.FRAMES.forEach((f) => {
+      const im = new Image();
+      im.src = f.src + "?v=20261029e";
+    });
   }
 
   function initStats() {
@@ -1616,6 +1798,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     bindFilters();
     bindGoalSearch();
+    preloadBodyMapFrames();
     document.addEventListener("click", onClick);
     document.addEventListener("keydown", (ev) => {
       if (ev.key !== "Enter" && ev.key !== " ") return;

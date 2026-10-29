@@ -1,15 +1,23 @@
-/* 健身教練 Lite — 全身肌肉圖（示意＋一般飲食參考，非醫療） */
+/* 健身教練 Lite — 可旋轉解剖全身肌肉圖（示意＋一般飲食參考，非醫療） */
 window.FITNESS_MUSCLE_MAP = (function () {
   "use strict";
 
   const HL = "#ff6a2a";
-  const HL_SOFT = "rgba(255, 106, 42, 0.35)";
-  const BODY = "#4b5563";
-  const BODY_LT = "#6b7280";
-  const OUT = "#374151";
-  const BG = "#111827";
+  const HL_SOFT = "rgba(255, 106, 42, 0.55)";
+  const HL_GLOW = "rgba(255, 140, 60, 0.35)";
 
-  /** @type {Array<{id:string,name:string,latin:string,side:string,groupIds:string[],exerciseIds:string[],blurb:string,nutrition:string,foods:string[]}>} */
+  /** 8 幀轉盤：拖曳左右旋轉（原創作解剖海報風格，非抄他牌） */
+  const FRAMES = [
+    { id: "front", src: "assets/img/bodymap/front.jpg", yaw: 0, hotspot: "front", label: "正面" },
+    { id: "front-lq", src: "assets/img/bodymap/front-lq.jpg", yaw: 45, hotspot: "front", label: "左斜" },
+    { id: "side-l", src: "assets/img/bodymap/side-l.jpg", yaw: 90, hotspot: null, label: "左側" },
+    { id: "back-lq", src: "assets/img/bodymap/back-lq.jpg", yaw: 135, hotspot: "back", label: "背左斜" },
+    { id: "back", src: "assets/img/bodymap/back.jpg", yaw: 180, hotspot: "back", label: "背面" },
+    { id: "back-rq", src: "assets/img/bodymap/back-rq.jpg", yaw: 225, hotspot: "back", label: "背右斜" },
+    { id: "side-r", src: "assets/img/bodymap/side-r.jpg", yaw: 270, hotspot: null, label: "右側" },
+    { id: "front-rq", src: "assets/img/bodymap/front-rq.jpg", yaw: 315, hotspot: "front", label: "右斜" }
+  ];
+
   const regions = [
     {
       id: "pecs",
@@ -213,109 +221,154 @@ window.FITNESS_MUSCLE_MAP = (function () {
 
   function hotspotAttrs(id, selected) {
     const on = selected === id;
-    return `data-muscle-hotspot="${escapeAttr(id)}" role="button" tabindex="0" aria-label="${escapeAttr((byId(id) || {}).name || id)}" aria-pressed="${on ? "true" : "false"}" class="mm-hotspot${on ? " is-on" : ""}" style="cursor:pointer; outline:none;"`;
+    return `data-muscle-hotspot="${escapeAttr(id)}" role="button" tabindex="0" aria-label="${escapeAttr((byId(id) || {}).name || id)}" aria-pressed="${on ? "true" : "false"}" class="mm-hotspot${on ? " is-on" : ""}"`;
   }
 
-  function fillFor(id, selected, base) {
-    return selected === id ? HL : base || BODY;
+  function fillFor(id, selected) {
+    return selected === id ? HL_SOFT : "transparent";
   }
 
-  /** Front view SVG with clickable regions */
-  function frontSvg(selected) {
-    const f = (id) => fillFor(id, selected, BODY);
-    const soft = (id) => (selected === id ? HL : BODY_LT);
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 420" width="100%" height="100%" class="muscle-map-svg" aria-label="正面全身肌肉示意圖">
-      <rect x="0" y="0" width="200" height="420" fill="${BG}" rx="16"/>
-      <!-- head -->
-      <circle cx="100" cy="36" r="22" fill="${BODY_LT}" stroke="${OUT}" stroke-width="1.5"/>
-      <rect x="92" y="56" width="16" height="14" rx="4" fill="${BODY}"/>
-      <!-- delts front / side -->
-      <ellipse ${hotspotAttrs("delts-front", selected)} cx="62" cy="88" rx="18" ry="14" fill="${f("delts-front")}" stroke="${OUT}" stroke-width="1.2"/>
-      <ellipse ${hotspotAttrs("delts-front", selected)} cx="138" cy="88" rx="18" ry="14" fill="${f("delts-front")}" stroke="${OUT}" stroke-width="1.2"/>
-      <ellipse ${hotspotAttrs("delts-side", selected)} cx="48" cy="92" rx="10" ry="12" fill="${f("delts-side")}" stroke="${OUT}" stroke-width="1"/>
-      <ellipse ${hotspotAttrs("delts-side", selected)} cx="152" cy="92" rx="10" ry="12" fill="${f("delts-side")}" stroke="${OUT}" stroke-width="1"/>
+  function strokeFor(id, selected) {
+    return selected === id ? HL : "transparent";
+  }
+
+  /** Photo-aligned front hotspots (viewBox matches 3:4 anatomy still) */
+  function frontOverlaySvg(selected) {
+    const f = (id) => fillFor(id, selected);
+    const s = (id) => strokeFor(id, selected);
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" class="muscle-map-overlay" aria-hidden="false" aria-label="正面肌肉熱點">
+      <defs>
+        <filter id="mmGlow" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="3.5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <!-- delts front -->
+      <ellipse ${hotspotAttrs("delts-front", selected)} cx="98" cy="92" rx="22" ry="16" fill="${f("delts-front")}" stroke="${s("delts-front")}" stroke-width="1.5" filter="${selected === "delts-front" ? "url(#mmGlow)" : "none"}"/>
+      <ellipse ${hotspotAttrs("delts-front", selected)} cx="202" cy="92" rx="22" ry="16" fill="${f("delts-front")}" stroke="${s("delts-front")}" stroke-width="1.5" filter="${selected === "delts-front" ? "url(#mmGlow)" : "none"}"/>
+      <!-- delts side -->
+      <ellipse ${hotspotAttrs("delts-side", selected)} cx="78" cy="98" rx="12" ry="15" fill="${f("delts-side")}" stroke="${s("delts-side")}" stroke-width="1.2" filter="${selected === "delts-side" ? "url(#mmGlow)" : "none"}"/>
+      <ellipse ${hotspotAttrs("delts-side", selected)} cx="222" cy="98" rx="12" ry="15" fill="${f("delts-side")}" stroke="${s("delts-side")}" stroke-width="1.2" filter="${selected === "delts-side" ? "url(#mmGlow)" : "none"}"/>
       <!-- pecs -->
-      <path ${hotspotAttrs("pecs", selected)} d="M70 78 Q100 70 130 78 L136 128 Q100 142 64 128 Z" fill="${f("pecs")}" stroke="${OUT}" stroke-width="1.4"/>
-      <!-- abs / core -->
-      <path ${hotspotAttrs("abs", selected)} d="M74 130 Q100 138 126 130 L122 188 Q100 198 78 188 Z" fill="${f("abs")}" stroke="${OUT}" stroke-width="1.2"/>
-      <!-- hip flexors band -->
-      <path ${hotspotAttrs("hip-flexors", selected)} d="M78 178 Q100 186 122 178 L118 205 Q100 212 82 205 Z" fill="${soft("hip-flexors")}" stroke="${OUT}" stroke-width="1" opacity="0.95"/>
+      <path ${hotspotAttrs("pecs", selected)} d="M105 78 Q150 68 195 78 L202 128 Q150 145 98 128 Z" fill="${f("pecs")}" stroke="${s("pecs")}" stroke-width="1.6" filter="${selected === "pecs" ? "url(#mmGlow)" : "none"}"/>
+      <!-- abs -->
+      <path ${hotspotAttrs("abs", selected)} d="M118 132 Q150 140 182 132 L176 195 Q150 208 124 195 Z" fill="${f("abs")}" stroke="${s("abs")}" stroke-width="1.4" filter="${selected === "abs" ? "url(#mmGlow)" : "none"}"/>
+      <!-- hip flexors -->
+      <path ${hotspotAttrs("hip-flexors", selected)} d="M122 188 Q150 198 178 188 L172 218 Q150 226 128 218 Z" fill="${f("hip-flexors")}" stroke="${s("hip-flexors")}" stroke-width="1.2" filter="${selected === "hip-flexors" ? "url(#mmGlow)" : "none"}"/>
       <!-- biceps -->
-      <rect ${hotspotAttrs("biceps", selected)} x="28" y="98" width="20" height="48" rx="9" fill="${f("biceps")}" stroke="${OUT}" stroke-width="1.2" transform="rotate(-10 38 122)"/>
-      <rect ${hotspotAttrs("biceps", selected)} x="152" y="98" width="20" height="48" rx="9" fill="${f("biceps")}" stroke="${OUT}" stroke-width="1.2" transform="rotate(10 162 122)"/>
+      <rect ${hotspotAttrs("biceps", selected)} x="58" y="105" width="24" height="52" rx="11" fill="${f("biceps")}" stroke="${s("biceps")}" stroke-width="1.4" transform="rotate(-8 70 131)" filter="${selected === "biceps" ? "url(#mmGlow)" : "none"}"/>
+      <rect ${hotspotAttrs("biceps", selected)} x="218" y="105" width="24" height="52" rx="11" fill="${f("biceps")}" stroke="${s("biceps")}" stroke-width="1.4" transform="rotate(8 230 131)" filter="${selected === "biceps" ? "url(#mmGlow)" : "none"}"/>
       <!-- forearms -->
-      <rect ${hotspotAttrs("forearms", selected)} x="22" y="148" width="16" height="46" rx="7" fill="${f("forearms")}" stroke="${OUT}" stroke-width="1" transform="rotate(-14 30 171)"/>
-      <rect ${hotspotAttrs("forearms", selected)} x="162" y="148" width="16" height="46" rx="7" fill="${f("forearms")}" stroke="${OUT}" stroke-width="1" transform="rotate(14 170 171)"/>
-      <ellipse cx="18" cy="198" rx="9" ry="8" fill="${BODY_LT}"/>
-      <ellipse cx="182" cy="198" rx="9" ry="8" fill="${BODY_LT}"/>
+      <rect ${hotspotAttrs("forearms", selected)} x="48" y="158" width="18" height="48" rx="8" fill="${f("forearms")}" stroke="${s("forearms")}" stroke-width="1.2" transform="rotate(-12 57 182)" filter="${selected === "forearms" ? "url(#mmGlow)" : "none"}"/>
+      <rect ${hotspotAttrs("forearms", selected)} x="234" y="158" width="18" height="48" rx="8" fill="${f("forearms")}" stroke="${s("forearms")}" stroke-width="1.2" transform="rotate(12 243 182)" filter="${selected === "forearms" ? "url(#mmGlow)" : "none"}"/>
       <!-- quads -->
-      <rect ${hotspotAttrs("quads", selected)} x="72" y="205" width="24" height="88" rx="11" fill="${f("quads")}" stroke="${OUT}" stroke-width="1.2"/>
-      <rect ${hotspotAttrs("quads", selected)} x="104" y="205" width="24" height="88" rx="11" fill="${f("quads")}" stroke="${OUT}" stroke-width="1.2"/>
-      <!-- adductors (inner thigh) -->
-      <rect ${hotspotAttrs("adductors", selected)} x="90" y="220" width="10" height="55" rx="5" fill="${soft("adductors")}" stroke="${OUT}" stroke-width="0.8"/>
-      <rect ${hotspotAttrs("adductors", selected)} x="100" y="220" width="10" height="55" rx="5" fill="${soft("adductors")}" stroke="${OUT}" stroke-width="0.8"/>
-      <!-- calves front hint -->
-      <rect ${hotspotAttrs("calves", selected)} x="76" y="298" width="16" height="52" rx="7" fill="${f("calves")}" stroke="${OUT}" stroke-width="1"/>
-      <rect ${hotspotAttrs("calves", selected)} x="108" y="298" width="16" height="52" rx="7" fill="${f("calves")}" stroke="${OUT}" stroke-width="1"/>
-      <ellipse cx="84" cy="360" rx="16" ry="8" fill="${BODY_LT}"/>
-      <ellipse cx="116" cy="360" rx="16" ry="8" fill="${BODY_LT}"/>
-      <text x="100" y="400" text-anchor="middle" fill="#9ca3af" font-size="11" font-family="sans-serif">正面 · 撳色塊睇介紹</text>
+      <rect ${hotspotAttrs("quads", selected)} x="118" y="222" width="28" height="78" rx="12" fill="${f("quads")}" stroke="${s("quads")}" stroke-width="1.4" filter="${selected === "quads" ? "url(#mmGlow)" : "none"}"/>
+      <rect ${hotspotAttrs("quads", selected)} x="154" y="222" width="28" height="78" rx="12" fill="${f("quads")}" stroke="${s("quads")}" stroke-width="1.4" filter="${selected === "quads" ? "url(#mmGlow)" : "none"}"/>
+      <!-- adductors -->
+      <rect ${hotspotAttrs("adductors", selected)} x="138" y="235" width="12" height="50" rx="5" fill="${f("adductors")}" stroke="${s("adductors")}" stroke-width="1" filter="${selected === "adductors" ? "url(#mmGlow)" : "none"}"/>
+      <rect ${hotspotAttrs("adductors", selected)} x="150" y="235" width="12" height="50" rx="5" fill="${f("adductors")}" stroke="${s("adductors")}" stroke-width="1" filter="${selected === "adductors" ? "url(#mmGlow)" : "none"}"/>
+      <!-- calves front -->
+      <rect ${hotspotAttrs("calves", selected)} x="122" y="308" width="20" height="48" rx="8" fill="${f("calves")}" stroke="${s("calves")}" stroke-width="1.2" filter="${selected === "calves" ? "url(#mmGlow)" : "none"}"/>
+      <rect ${hotspotAttrs("calves", selected)} x="158" y="308" width="20" height="48" rx="8" fill="${f("calves")}" stroke="${s("calves")}" stroke-width="1.2" filter="${selected === "calves" ? "url(#mmGlow)" : "none"}"/>
     </svg>`;
   }
 
-  /** Back view SVG */
-  function backSvg(selected) {
-    const f = (id) => fillFor(id, selected, BODY);
-    const soft = (id) => (selected === id ? HL : BODY_LT);
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 420" width="100%" height="100%" class="muscle-map-svg" aria-label="背面全身肌肉示意圖">
-      <rect x="0" y="0" width="200" height="420" fill="${BG}" rx="16"/>
-      <circle cx="100" cy="36" r="22" fill="${BODY_LT}" stroke="${OUT}" stroke-width="1.5"/>
-      <rect x="92" y="56" width="16" height="14" rx="4" fill="${BODY}"/>
+  function backOverlaySvg(selected) {
+    const f = (id) => fillFor(id, selected);
+    const s = (id) => strokeFor(id, selected);
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" class="muscle-map-overlay" aria-label="背面肌肉熱點">
+      <defs>
+        <filter id="mmGlowB" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="3.5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
       <!-- traps -->
-      <path ${hotspotAttrs("traps", selected)} d="M70 72 Q100 62 130 72 L124 108 Q100 118 76 108 Z" fill="${f("traps")}" stroke="${OUT}" stroke-width="1.3"/>
+      <path ${hotspotAttrs("traps", selected)} d="M110 72 Q150 58 190 72 L182 112 Q150 124 118 112 Z" fill="${f("traps")}" stroke="${s("traps")}" stroke-width="1.5" filter="${selected === "traps" ? "url(#mmGlowB)" : "none"}"/>
       <!-- rear delts -->
-      <ellipse ${hotspotAttrs("delts-rear", selected)} cx="58" cy="90" rx="16" ry="12" fill="${f("delts-rear")}" stroke="${OUT}" stroke-width="1.2"/>
-      <ellipse ${hotspotAttrs("delts-rear", selected)} cx="142" cy="90" rx="16" ry="12" fill="${f("delts-rear")}" stroke="${OUT}" stroke-width="1.2"/>
+      <ellipse ${hotspotAttrs("delts-rear", selected)} cx="95" cy="95" rx="20" ry="15" fill="${f("delts-rear")}" stroke="${s("delts-rear")}" stroke-width="1.4" filter="${selected === "delts-rear" ? "url(#mmGlowB)" : "none"}"/>
+      <ellipse ${hotspotAttrs("delts-rear", selected)} cx="205" cy="95" rx="20" ry="15" fill="${f("delts-rear")}" stroke="${s("delts-rear")}" stroke-width="1.4" filter="${selected === "delts-rear" ? "url(#mmGlowB)" : "none"}"/>
       <!-- lats -->
-      <path ${hotspotAttrs("lats", selected)} d="M68 100 L78 108 L78 175 Q100 188 122 175 L122 108 L132 100 Q148 130 140 175 Q100 200 60 175 Q52 130 68 100 Z" fill="${f("lats")}" stroke="${OUT}" stroke-width="1.3"/>
-      <!-- erectors / lower back strip -->
-      <path ${hotspotAttrs("erectors", selected)} d="M90 120 L110 120 L108 195 Q100 202 92 195 Z" fill="${soft("erectors")}" stroke="${OUT}" stroke-width="1"/>
+      <path ${hotspotAttrs("lats", selected)} d="M105 105 L118 115 L118 185 Q150 205 182 185 L182 115 L195 105 Q218 140 205 188 Q150 220 95 188 Q82 140 105 105 Z" fill="${f("lats")}" stroke="${s("lats")}" stroke-width="1.5" filter="${selected === "lats" ? "url(#mmGlowB)" : "none"}"/>
+      <!-- erectors -->
+      <path ${hotspotAttrs("erectors", selected)} d="M138 120 L162 120 L158 200 Q150 210 142 200 Z" fill="${f("erectors")}" stroke="${s("erectors")}" stroke-width="1.2" filter="${selected === "erectors" ? "url(#mmGlowB)" : "none"}"/>
       <!-- triceps -->
-      <rect ${hotspotAttrs("triceps", selected)} x="30" y="98" width="18" height="50" rx="8" fill="${f("triceps")}" stroke="${OUT}" stroke-width="1.2" transform="rotate(-8 39 123)"/>
-      <rect ${hotspotAttrs("triceps", selected)} x="152" y="98" width="18" height="50" rx="8" fill="${f("triceps")}" stroke="${OUT}" stroke-width="1.2" transform="rotate(8 161 123)"/>
+      <rect ${hotspotAttrs("triceps", selected)} x="58" y="105" width="22" height="54" rx="10" fill="${f("triceps")}" stroke="${s("triceps")}" stroke-width="1.4" transform="rotate(-6 69 132)" filter="${selected === "triceps" ? "url(#mmGlowB)" : "none"}"/>
+      <rect ${hotspotAttrs("triceps", selected)} x="220" y="105" width="22" height="54" rx="10" fill="${f("triceps")}" stroke="${s("triceps")}" stroke-width="1.4" transform="rotate(6 231 132)" filter="${selected === "triceps" ? "url(#mmGlowB)" : "none"}"/>
       <!-- forearms back -->
-      <rect ${hotspotAttrs("forearms", selected)} x="24" y="150" width="15" height="44" rx="6" fill="${f("forearms")}" stroke="${OUT}" stroke-width="1" transform="rotate(-12 31 172)"/>
-      <rect ${hotspotAttrs("forearms", selected)} x="161" y="150" width="15" height="44" rx="6" fill="${f("forearms")}" stroke="${OUT}" stroke-width="1" transform="rotate(12 169 172)"/>
-      <ellipse cx="20" cy="198" rx="9" ry="8" fill="${BODY_LT}"/>
-      <ellipse cx="180" cy="198" rx="9" ry="8" fill="${BODY_LT}"/>
+      <rect ${hotspotAttrs("forearms", selected)} x="50" y="160" width="17" height="46" rx="7" fill="${f("forearms")}" stroke="${s("forearms")}" stroke-width="1.2" transform="rotate(-10 58 183)" filter="${selected === "forearms" ? "url(#mmGlowB)" : "none"}"/>
+      <rect ${hotspotAttrs("forearms", selected)} x="233" y="160" width="17" height="46" rx="7" fill="${f("forearms")}" stroke="${s("forearms")}" stroke-width="1.2" transform="rotate(10 241 183)" filter="${selected === "forearms" ? "url(#mmGlowB)" : "none"}"/>
       <!-- glutes -->
-      <ellipse ${hotspotAttrs("glutes", selected)} cx="86" cy="215" rx="22" ry="20" fill="${f("glutes")}" stroke="${OUT}" stroke-width="1.3"/>
-      <ellipse ${hotspotAttrs("glutes", selected)} cx="114" cy="215" rx="22" ry="20" fill="${f("glutes")}" stroke="${OUT}" stroke-width="1.3"/>
+      <ellipse ${hotspotAttrs("glutes", selected)} cx="128" cy="225" rx="26" ry="22" fill="${f("glutes")}" stroke="${s("glutes")}" stroke-width="1.5" filter="${selected === "glutes" ? "url(#mmGlowB)" : "none"}"/>
+      <ellipse ${hotspotAttrs("glutes", selected)} cx="172" cy="225" rx="26" ry="22" fill="${f("glutes")}" stroke="${s("glutes")}" stroke-width="1.5" filter="${selected === "glutes" ? "url(#mmGlowB)" : "none"}"/>
       <!-- hamstrings -->
-      <rect ${hotspotAttrs("hamstrings", selected)} x="72" y="235" width="22" height="70" rx="10" fill="${f("hamstrings")}" stroke="${OUT}" stroke-width="1.2"/>
-      <rect ${hotspotAttrs("hamstrings", selected)} x="106" y="235" width="22" height="70" rx="10" fill="${f("hamstrings")}" stroke="${OUT}" stroke-width="1.2"/>
+      <rect ${hotspotAttrs("hamstrings", selected)} x="118" y="248" width="26" height="62" rx="11" fill="${f("hamstrings")}" stroke="${s("hamstrings")}" stroke-width="1.4" filter="${selected === "hamstrings" ? "url(#mmGlowB)" : "none"}"/>
+      <rect ${hotspotAttrs("hamstrings", selected)} x="156" y="248" width="26" height="62" rx="11" fill="${f("hamstrings")}" stroke="${s("hamstrings")}" stroke-width="1.4" filter="${selected === "hamstrings" ? "url(#mmGlowB)" : "none"}"/>
       <!-- calves -->
-      <path ${hotspotAttrs("calves", selected)} d="M74 308 Q84 300 92 308 L90 355 Q83 362 76 355 Z" fill="${f("calves")}" stroke="${OUT}" stroke-width="1.1"/>
-      <path ${hotspotAttrs("calves", selected)} d="M108 308 Q118 300 126 308 L124 355 Q117 362 110 355 Z" fill="${f("calves")}" stroke="${OUT}" stroke-width="1.1"/>
-      <ellipse cx="84" cy="368" rx="15" ry="7" fill="${BODY_LT}"/>
-      <ellipse cx="116" cy="368" rx="15" ry="7" fill="${BODY_LT}"/>
-      <text x="100" y="400" text-anchor="middle" fill="#9ca3af" font-size="11" font-family="sans-serif">背面 · 撳色塊睇介紹</text>
+      <path ${hotspotAttrs("calves", selected)} d="M120 318 Q132 308 144 318 L140 362 Q132 370 124 362 Z" fill="${f("calves")}" stroke="${s("calves")}" stroke-width="1.2" filter="${selected === "calves" ? "url(#mmGlowB)" : "none"}"/>
+      <path ${hotspotAttrs("calves", selected)} d="M156 318 Q168 308 180 318 L176 362 Q168 370 160 362 Z" fill="${f("calves")}" stroke="${s("calves")}" stroke-width="1.2" filter="${selected === "calves" ? "url(#mmGlowB)" : "none"}"/>
     </svg>`;
+  }
+
+  /** Legacy aliases kept for safety */
+  function frontSvg(selected) {
+    return frontOverlaySvg(selected);
+  }
+  function backSvg(selected) {
+    return backOverlaySvg(selected);
   }
 
   function listForSide(side) {
     if (side === "front") {
       return regions.filter((r) => r.side === "front" || r.side === "both");
     }
-    return regions.filter((r) => r.side === "back" || r.side === "both");
+    if (side === "back") {
+      return regions.filter((r) => r.side === "back" || r.side === "both");
+    }
+    return regions.slice();
+  }
+
+  function frameAt(index) {
+    const n = FRAMES.length;
+    const i = ((index % n) + n) % n;
+    return FRAMES[i];
+  }
+
+  function indexForSide(side) {
+    if (side === "back") return FRAMES.findIndex((f) => f.id === "back");
+    return FRAMES.findIndex((f) => f.id === "front");
+  }
+
+  function bestFrameForRegion(region) {
+    if (!region) return 0;
+    if (region.side === "back") return indexForSide("back");
+    if (region.side === "front") return indexForSide("front");
+    return null; // both: keep current
+  }
+
+  function sideFromFrame(frame) {
+    if (!frame) return "front";
+    if (frame.hotspot === "back") return "back";
+    if (frame.hotspot === "front") return "front";
+    // side views: infer from yaw
+    const y = frame.yaw;
+    if (y > 90 && y < 270) return "back";
+    return "front";
   }
 
   return {
     regions,
+    FRAMES,
     byId,
     frontSvg,
     backSvg,
+    frontOverlaySvg,
+    backOverlaySvg,
     listForSide,
+    frameAt,
+    indexForSide,
+    bestFrameForRegion,
+    sideFromFrame,
     HL
   };
 })();
