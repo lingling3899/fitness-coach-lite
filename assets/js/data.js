@@ -17,7 +17,7 @@ window.FITNESS_DATA = {
       tip: "練背重點係「拉到肩胛骨郁」，唔係淨係手臂用力。坐姿划船同啞鈴划船最易學到感覺；高位下拉注意唔好過度後仰。",
       targets: "闊背肌、中下斜方、菱形肌、二頭（輔助）",
       aliases: ["背", "背部", "後背", "闊背", "背肌", "增肌背", "back", "lats", "引體", "直臂下壓"],
-      moves: ["seated-row", "lat-pulldown", "assisted-pullup", "straight-arm-pulldown", "db-row", "face-pull"]
+      moves: ["seated-row", "lat-pulldown", "assisted-pullup", "straight-arm-pulldown", "db-row", "face-pull", "pilates-swan", "reformer-arms-pulling"]
     },
     {
       id: "shoulders",
@@ -44,7 +44,7 @@ window.FITNESS_DATA = {
       tip: "下肢係全身力量基礎。深蹲同腿舉注意膝蓋對準腳尖方向，腰背保持自然中立。家用可用徒手深蹲、弓步、臀橋起步。",
       targets: "股四頭、腘繩肌、臀大肌、小腿（輔助）",
       aliases: ["腿", "下肢", "大腿", "小腿", "股四", "增肌腿", "legs", "quads", "hamstrings", "蹬腿", "踏板", "腿伸展", "伸膝", "哈克", "腿彎曲", "腘繩", "垂直腿舉"],
-      moves: ["smith-squat", "hack-squat", "leg-press", "vertical-leg-press", "dual-pedal-press", "leg-extension", "leg-curl", "bw-squat", "lunge", "glute-bridge"]
+      moves: ["smith-squat", "hack-squat", "leg-press", "vertical-leg-press", "dual-pedal-press", "leg-extension", "leg-curl", "bw-squat", "lunge", "glute-bridge", "reformer-footwork", "pilates-side-kick"]
     },
     {
       id: "glutes",
@@ -53,7 +53,7 @@ window.FITNESS_DATA = {
       tip: "練臀重點係髖鉸鏈同頂端夾臀，唔好淨係用腰拱起代替。臀橋、弓步、深蹲都有助臀部發力；控制下放效果更好。",
       targets: "臀大肌、臀中肌（穩定）、腘繩肌（輔助）",
       aliases: ["臀", "臀部", "屁股", "翹臀", "臀肌", "glutes", "glute"],
-      moves: ["glute-bridge", "lunge", "bw-squat", "smith-squat", "hack-squat", "leg-press", "vertical-leg-press", "dual-pedal-press", "stair-climber"]
+      moves: ["glute-bridge", "lunge", "bw-squat", "smith-squat", "hack-squat", "leg-press", "vertical-leg-press", "dual-pedal-press", "stair-climber", "pilates-side-kick", "pilates-bridge", "reformer-footwork", "reformer-leg-circles"]
     },
     {
       id: "core",
@@ -61,8 +61,8 @@ window.FITNESS_DATA = {
       emoji: "🔥",
       tip: "核心唔止係腹肌，仲包括穩定腰椎同骨盆。平板撑先求時間同姿勢，再進階；呼吸要順，唔好閉氣用力。",
       targets: "腹直肌、腹橫肌、斜腹、豎脊肌（穩定）",
-      aliases: ["核心", "腹肌", "腹", "腰腹", "中軸", "core", "abs", "腹部", "抬腿", "捲腹"],
-      moves: ["plank", "hanging-leg-raise", "ab-crunch-machine", "glute-bridge", "bw-squat"]
+      aliases: ["核心", "腹肌", "腹", "腰腹", "中軸", "core", "abs", "腹部", "抬腿", "捲腹", "普拉提", "拉根", "reformer", "pilates", "核心穩定", "女士拉根"],
+      moves: ["plank", "hanging-leg-raise", "ab-crunch-machine", "glute-bridge", "bw-squat", "pilates-hundred", "pilates-roll-up", "pilates-single-leg-stretch", "pilates-bridge", "reformer-elephant", "reformer-knee-stretches"]
     },
     {
       id: "cardio",
@@ -784,9 +784,230 @@ window.FITNESS_DATA = {
       mistakes: ["啞鈴路徑不穩", "過度拱腰", "下放過低扯肩（長凳）", "鎖死猛撞"],
       prescription: "新手 3 組 × 8–12 次",
       safety: "地板版幅度較安全適合家用；起立時小心將啞鈴放低再起身。"
-    }
-  ],
+    },
 
+    /* —— 普拉提地墊／拉根（Reformer） —— */
+    {
+      id: "pilates-hundred",
+      name: "普拉提・百次呼吸",
+      category: "pilates",
+      muscles: ["core"],
+      formCue: "spine",
+      wrongCue: "頸過度用力、塌腰",
+      rightCue: "頭頸輕托、腰貼地",
+      muscleBadge: "核心",
+      emoji: "🧘",
+      steps: [
+        "仰臥，雙膝可屈或伸，雙臂貼身側。",
+        "呼氣捲頭肩離地，目視大腿；雙臂與身體平行離地約一掌。",
+        "用鼻短吸五下、口短呼五下，同時上下小幅擺臂，合計約一百下。",
+        "全程下背輕貼地、核心收；完組緩慢放低頭肩。"
+      ],
+      mistakes: ["用頸硬撑離地", "下背拱起離地", "憋氣或聳肩", "擺臂幅度過大甩動"],
+      prescription: "新手 1–2 組 × 50–100 下呼吸（可屈膝減難）",
+      safety: "頸／下背不適可頭枕地只做手臂；懷孕或急性腰傷請先咨詢專業人士。示意非醫療。"
+    },
+    {
+      id: "pilates-roll-up",
+      name: "普拉提・捲起",
+      category: "pilates",
+      muscles: ["core"],
+      formCue: "spine",
+      wrongCue: "借慣力彈起、甩腳",
+      rightCue: "逐節脊椎捲起放低",
+      muscleBadge: "核心",
+      emoji: "🌀",
+      steps: [
+        "仰臥，雙腿伸直或微屈，雙臂過頭伸直。",
+        "吸氣準備；呼氣收下顎，逐節將脊椎捲起至坐直，手臂向前指腳尖。",
+        "頂端拉長坐骨站立感，肩放鬆。",
+        "吸氣由尾骨開始逐節滾回地面，手臂再過頭。"
+      ],
+      mistakes: ["用慣力彈起", "雙腳離地借勢", "一次整塊起身忽略分節", "肩聳起遮耳"],
+      prescription: "新手 3 組 × 5–8 次（可屈膝或用手輕助）",
+      safety: "腰椎敏感者减小幅度或改做半捲；有骨質疏鬆／椎間盤問題先咨詢專業。示意非醫療。"
+    },
+    {
+      id: "pilates-single-leg-stretch",
+      name: "普拉提・單腿伸展",
+      category: "pilates",
+      muscles: ["core", "legs"],
+      formCue: "spine",
+      wrongCue: "腰拱、拉頸",
+      rightCue: "腰貼地、換腿流暢",
+      muscleBadge: "核心",
+      emoji: "🦵",
+      steps: [
+        "仰臥，頭肩捲起，一膝拉向胸、另一腿約 45° 斜出。",
+        "雙手輕扶屈曲側小腿或膝外側（唔拉頸）。",
+        "呼氣換邊：伸直腿回收、另一腿伸出，核心持續收。",
+        "視線向大腿，下背盡量貼地。"
+      ],
+      mistakes: ["用手猛拉頸部", "換腿時腰拱起", "伸出腿過低致腰離地", "憋氣"],
+      prescription: "新手 3 組 × 每側 6–10 次",
+      safety: "頸累可頭枕地只做腿部交換；髖屈肌緊绷可减小伸出幅度。示意非醫療。"
+    },
+    {
+      id: "pilates-swan",
+      name: "普拉提・天鵝式",
+      category: "pilates",
+      muscles: ["back", "core", "shoulders"],
+      formCue: "spine",
+      wrongCue: "過度後仰擠腰",
+      rightCue: "胸椎伸展、臀輕夾",
+      muscleBadge: "背",
+      emoji: "🦢",
+      steps: [
+        "俯臥，雙腿伸直，雙手約於肩下撑地，肘貼身。",
+        "吸氣延長脊椎；呼氣輕推手，由胸椎開始向上伸展。",
+        "恥骨輕壓地、臀輕夾，頸隨胸椎自然延長唔猛抬頭。",
+        "吸氣控制放低回起始，重複。"
+      ],
+      mistakes: ["只用腰過度後仰", "聳肩遮耳", "頭過度後仰", "手推過猛離地過多"],
+      prescription: "新手 3 組 × 6–10 次（小幅度）",
+      safety: "下背敏感只做極小伸展或改俯卧伸展；椎間盤／急性腰傷先咨詢專業。示意非醫療。"
+    },
+    {
+      id: "pilates-side-kick",
+      name: "普拉提・側踢",
+      category: "pilates",
+      muscles: ["glutes", "legs", "core"],
+      formCue: "spine",
+      wrongCue: "軀幹前後晃、塌腰",
+      rightCue: "側腰穩定、髖帶動",
+      muscleBadge: "臀腿",
+      emoji: "🦶",
+      steps: [
+        "側臥，身體成一直線，下方手臂托頭或伸直，上方手輕撑身前穩定。",
+        "上方腿與髖同高向前踢（腳屈或尖），幅度可控。",
+        "再向後輕擺，唔過度拱腰；核心同側腰保持穩定。",
+        "完成一側再換邊。"
+      ],
+      mistakes: ["身體前後滾動借慣力", "後踢過度致腰塌", "上方肩聳起", "支撐手過度用力歪身"],
+      prescription: "新手每側 2–3 組 × 8–12 次（前踢＋後擺算一回合）",
+      safety: "髖／下背不適减小幅度；可靠牆或屈下腿增加穩定。懷孕側臥姿勢請咨詢專業。示意非醫療。"
+    },
+    {
+      id: "pilates-bridge",
+      name: "普拉提・橋式",
+      category: "pilates",
+      muscles: ["glutes", "core", "legs"],
+      formCue: "spine",
+      wrongCue: "用腰拱代替夾臀",
+      rightCue: "逐節捲起、頂端夾臀",
+      muscleBadge: "臀核",
+      emoji: "🌉",
+      steps: [
+        "仰臥屈膝，腳掌與髖同寬着地，雙臂身側。",
+        "呼氣由尾骨開始逐節將脊椎捲離地，至肩到膝成斜線。",
+        "頂端夾臀、肋骨唔過度翻開。",
+        "吸氣由上背開始逐節滾回地面。"
+      ],
+      mistakes: ["一次整塊抬起忽略分節", "頂端過度伸腰", "膝內扣", "腳離臀過遠"],
+      prescription: "新手 3 組 × 8–12 次",
+      safety: "下背易緊者頂端唔要過度伸展；可雙腳靠近臀部。示意非醫療。"
+    },
+    {
+      id: "reformer-footwork",
+      name: "拉根・腳部訓練（Footwork）",
+      category: "pilates",
+      muscles: ["legs", "glutes", "core"],
+      formCue: "knee",
+      wrongCue: "膝內扣、骨盆左右傾",
+      rightCue: "膝對腳尖、核心穩",
+      muscleBadge: "腿",
+      emoji: "🛏️",
+      steps: [
+        "仰臥於 Reformer（拉根床），雙腳置腳板（足跟／足弓／足尖可輪換），握住肩托穩定。",
+        "吸氣屈膝收車架；呼氣經腳蹬直雙腿（膝唔鎖死），控制彈簧阻力。",
+        "骨盆水平、腰保持自然中立，核心輕收。",
+        "重複，再換足部位置刺激不同發力。"
+      ],
+      mistakes: ["膝蓋內扣", "蹬直時鎖死彈膝", "臀部左右晃", "頭部過度用力頂肩托"],
+      prescription: "新手每足位 2 組 × 8–12 次（輕至中等彈簧）",
+      safety: "首次由教練調彈簧同腳位；膝踝不適即减阻或停。懷孕／產後請專業指導。示意非醫療。"
+    },
+    {
+      id: "reformer-leg-circles",
+      name: "拉根・腿畫圈（Leg Circles）",
+      category: "pilates",
+      muscles: ["glutes", "core", "legs"],
+      formCue: "spine",
+      wrongCue: "骨盆隨腿大幅晃",
+      rightCue: "骨盆穩、髖帶動畫圈",
+      muscleBadge: "臀核",
+      emoji: "⭕",
+      steps: [
+        "仰臥，一腳入腳帶或置腳棒，另一腿可屈踩腳板或伸直穩定。",
+        "工作腿由髖帶動畫小至中圈，車架隨之平滑移動。",
+        "骨盆同腰盡量穩定，唔隨腿左右傾。",
+        "完成指定圈數後反向，再換腿。"
+      ],
+      mistakes: ["圈過大令骨盆翻轉", "腰拱起借力", "彈簧過重失控", "憋氣聳肩"],
+      prescription: "新手每腿每方向 5–8 圈（輕彈簧）",
+      safety: "髖撞擊感應即缩小圈徑；初學必須有人調設定。示意非醫療。"
+    },
+    {
+      id: "reformer-elephant",
+      name: "拉根・大象式（Elephant）",
+      category: "pilates",
+      muscles: ["core", "legs", "back"],
+      formCue: "spine",
+      wrongCue: "塌腰或圓背過度甩",
+      rightCue: "倒 V 穩定、腳跟下壓感",
+      muscleBadge: "核心",
+      emoji: "🐘",
+      steps: [
+        "雙手握腳棒、雙腳踩車架（倒 V／向下犬變體），手足約與肩／髖同寬。",
+        "吸氣微屈膝或保持；呼氣經腳推動車架向後少許再收回。",
+        "肩穩、背延長，核心收，頭部喺雙臂之間中立。",
+        "幅度細而可控，唔靠慣力彈回。"
+      ],
+      mistakes: ["腰塌成香蕉背", "肩過度受壓耸起", "車架推太遠失控", "膝鎖死崩直"],
+      prescription: "新手 2–3 組 × 6–10 次（輕彈簧）",
+      safety: "腕／肩不適可改其他站姿拉根動作；高血壓或腕傷先咨詢。需教練調彈簧。示意非醫療。"
+    },
+    {
+      id: "reformer-arms-pulling",
+      name: "拉根・手臂拉（Arms Pulling）",
+      category: "pilates",
+      muscles: ["back", "arms", "core", "shoulders"],
+      formCue: "spine",
+      wrongCue: "聳肩、甩腰借力",
+      rightCue: "肩胛下滑再拉、核心穩",
+      muscleBadge: "背",
+      emoji: "🪢",
+      steps: [
+        "坐或仰臥於車架（視工作室設定），雙手握繩索把手。",
+        "先令肩胛輕微下沉後夾，再屈肘將繩拉向身側或髖旁。",
+        "肘貼身軌跡，核心收、頸中立。",
+        "控制回放至手臂伸展，重複。"
+      ],
+      mistakes: ["先聳肩再拉", "借腰後仰甩", "彈簧過重致路徑抖", "手腕過度屈曲"],
+      prescription: "新手 3 組 × 8–12 次（輕至中彈簧）",
+      safety: "肩舊患用更輕阻同减小幅度；設定依各品牌拉根床不同，初學需指導。示意非醫療。"
+    },
+    {
+      id: "reformer-knee-stretches",
+      name: "拉根・跪姿伸展（Knee Stretches）",
+      category: "pilates",
+      muscles: ["core", "glutes", "legs"],
+      formCue: "spine",
+      wrongCue: "塌腰或圓背失控",
+      rightCue: "圓背／平背設定下核心帶動",
+      muscleBadge: "核心",
+      emoji: "🧎",
+      steps: [
+        "跪於車架，雙手握腳棒，膝約於肩托前（圓背或平背變體依教練提示）。",
+        "呼氣經核心同髖將車架向後推一小段；吸氣控制收回。",
+        "肩穩定喺腳棒上方，唔塌腰甩動。",
+        "保持節奏短促可控，完成組數。"
+      ],
+      mistakes: ["推太遠失去核心", "肩過度受壓", "膝在車架上滑動不穩", "憋氣"],
+      prescription: "新手 2–3 組 × 8–12 次（輕彈簧）",
+      safety: "膝痛可加厚墊或改其他動作；腰敏感優先平背變體並减小幅度。需專業調校。示意非醫療。"
+    },
+  ],
 
   dailyTips: [
     { id: "warm", emoji: "🔥", text: "開組前花 5–8 分鐘輕量活動同動態伸展，關節熱咗再加重，感覺會穩陣啲。" },
@@ -798,7 +1019,7 @@ window.FITNESS_DATA = {
 
   challenge: {
     title: "21 日入門挑戰",
-    subtitle: "每日一動作 · 示意圖解 · 而家內建 35 款解剖圖解示意短片 · 其餘可自備連結",
+    subtitle: "每日一動作 · 示意圖解 · 而家內建解剖圖解示意短片（含普拉提／拉根） · 其餘可自備連結",
     days: [
       { day: 1, exerciseId: "pushup" },
       { day: 2, exerciseId: "db-curl" },

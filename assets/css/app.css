@@ -315,6 +315,7 @@ textarea { min-height: 88px; resize: vertical; }
 .pill.gym { background: rgba(91, 140, 255, 0.18); color: #9bbcff; }
 .pill.home { background: rgba(61, 220, 151, 0.16); color: #7aefbf; }
 .pill.cardio { background: rgba(255, 120, 160, 0.16); color: #ff9aba; }
+.pill.pilates { background: rgba(186, 140, 255, 0.18); color: #d2b4ff; }
 .tag {
   display: inline-block;
   margin-left: 4px;

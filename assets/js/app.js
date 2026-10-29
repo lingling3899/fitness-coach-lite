@@ -6,7 +6,7 @@
   const VIDEO_KEY = "fitnessCoachLite.videos.v1";
   const USERS_KEY = "fitnessCoachLite.users.v1";
   const SESSION_KEY = "fitnessCoachLite.session.v1";
-  const CACHE = "20261029d";
+  const CACHE = "20261029f";
   const BUNDLED_VIDEOS = {
     "db-row": { src: "assets/videos/db-row.mp4", poster: "assets/videos/db-row.jpg" },
     "db-shoulder-press": { src: "assets/videos/db-shoulder-press.mp4", poster: "assets/videos/db-shoulder-press.jpg" },
@@ -42,7 +42,18 @@
     "elliptical": { src: "assets/videos/elliptical.mp4", poster: "assets/videos/elliptical.jpg" },
     "upright-bike": { src: "assets/videos/upright-bike.mp4", poster: "assets/videos/upright-bike.jpg" },
     "recumbent-bike": { src: "assets/videos/recumbent-bike.mp4", poster: "assets/videos/recumbent-bike.jpg" },
-    "stair-climber": { src: "assets/videos/stair-climber.mp4", poster: "assets/videos/stair-climber.jpg" }
+    "stair-climber": { src: "assets/videos/stair-climber.mp4", poster: "assets/videos/stair-climber.jpg" },
+    "pilates-hundred": { src: "assets/videos/pilates-hundred.mp4", poster: "assets/videos/pilates-hundred.jpg" },
+    "pilates-roll-up": { src: "assets/videos/pilates-roll-up.mp4", poster: "assets/videos/pilates-roll-up.jpg" },
+    "pilates-single-leg-stretch": { src: "assets/videos/pilates-single-leg-stretch.mp4", poster: "assets/videos/pilates-single-leg-stretch.jpg" },
+    "pilates-swan": { src: "assets/videos/pilates-swan.mp4", poster: "assets/videos/pilates-swan.jpg" },
+    "pilates-side-kick": { src: "assets/videos/pilates-side-kick.mp4", poster: "assets/videos/pilates-side-kick.jpg" },
+    "pilates-bridge": { src: "assets/videos/pilates-bridge.mp4", poster: "assets/videos/pilates-bridge.jpg" },
+    "reformer-footwork": { src: "assets/videos/reformer-footwork.mp4", poster: "assets/videos/reformer-footwork.jpg" },
+    "reformer-leg-circles": { src: "assets/videos/reformer-leg-circles.mp4", poster: "assets/videos/reformer-leg-circles.jpg" },
+    "reformer-elephant": { src: "assets/videos/reformer-elephant.mp4", poster: "assets/videos/reformer-elephant.jpg" },
+    "reformer-arms-pulling": { src: "assets/videos/reformer-arms-pulling.mp4", poster: "assets/videos/reformer-arms-pulling.jpg" },
+    "reformer-knee-stretches": { src: "assets/videos/reformer-knee-stretches.mp4", poster: "assets/videos/reformer-knee-stretches.jpg" }
   };
   const data = window.FITNESS_DATA;
   const anatomy = window.FITNESS_ANATOMY;
@@ -82,6 +93,7 @@
     { id: "core", label: "核心" },
     { id: "glutes", label: "臀" },
     { id: "cardio", label: "有氧" },
+    { id: "pilates", label: "普拉提" },
     { id: "full", label: "全身" }
   ];
 
@@ -90,7 +102,8 @@
     pull: ["seated-row", "db-row", "lat-pulldown", "assisted-pullup", "straight-arm-pulldown"],
     legs: ["bw-squat", "smith-squat", "hack-squat", "leg-press", "vertical-leg-press", "dual-pedal-press", "leg-extension", "leg-curl"],
     core: ["plank", "hanging-leg-raise", "ab-crunch-machine", "glute-bridge"],
-    cardio: ["treadmill", "elliptical", "upright-bike"]
+    cardio: ["treadmill", "elliptical", "upright-bike"],
+    pilates: ["pilates-hundred", "pilates-bridge", "reformer-footwork"]
   };
 
   function byId(id) {
@@ -105,6 +118,7 @@
   function catLabel(c) {
     if (c === "gym") return "健身房";
     if (c === "cardio") return "有氧";
+    if (c === "pilates") return "普拉提";
     return "家用";
   }
 
@@ -563,6 +577,20 @@
     if (q === "全身" || q === "全身訓練" || q === "full" || q === "fullbody" || q === "wholebody") {
       return { ids: [], full: true, unknown: false };
     }
+    if (
+      q === "pilates" ||
+      q === "普拉提" ||
+      q === "拉根" ||
+      q === "reformer" ||
+      q === "核心穩定" ||
+      q === "女士拉根" ||
+      q.includes("普拉提") ||
+      q.includes("拉根") ||
+      q.includes("reformer") ||
+      q.includes("pilates")
+    ) {
+      return { ids: ["core", "glutes", "legs", "back", "shoulders"], full: false, unknown: false, category: "pilates" };
+    }
     const hits = [];
     data.muscles.forEach((m) => {
       const names = [m.name, m.id].concat(m.aliases || []);
@@ -645,7 +673,8 @@
       const id = btn.dataset.goalChip;
       let on = false;
       if (id === "full") on = match.full;
-      else if (match.ids.includes(id) && !match.full) on = true;
+      else if (id === "pilates") on = match.category === "pilates";
+      else if (match.ids.includes(id) && !match.full && match.category !== "pilates") on = true;
       btn.classList.toggle("active", on);
     });
 
@@ -693,9 +722,20 @@
       tipHtml = `<div class="goal-tips">${tipHtml}</div>`;
     }
 
+    let relatedOther = [];
+    if (match.category === "pilates") {
+      relatedOther = rankExercisesForMuscles(match.ids)
+        .filter((e) => e.category !== "pilates")
+        .slice(0, 6);
+      list = data.exercises.filter((e) => e.category === "pilates");
+      tipHtml =
+        `<div class="goal-tips"><p class="coach-tip compact"><span aria-hidden="true">🧘</span> <strong>普拉提／拉根 tip：</strong>重點係核心穩定同控制呼吸；拉根（Reformer）彈簧阻力要由教練調。懷孕、腰傷或術後請先咨詢專業人士。示意非醫療。</p></div>`;
+    }
+
     const gym = list.filter((e) => e.category === "gym");
     const cardio = list.filter((e) => e.category === "cardio");
     const home = list.filter((e) => e.category === "home");
+    const pilates = list.filter((e) => e.category === "pilates");
 
     function section(title, items, emptyMsg) {
       if (!items.length) {
@@ -705,11 +745,19 @@
     }
 
     box.hidden = false;
-    box.innerHTML =
-      tipHtml +
-      section("健身房儀器", gym, "呢個目標暫時未收錄對應健身房儀器，可睇其他建議。") +
-      section("有氧器械", cardio, "呢個目標暫時未收錄有氧器械。") +
-      section("家用／徒手／啞鈴", home, "呢個目標暫時未收錄家用動作，可睇其他建議。");
+    let sectionsHtml = tipHtml;
+    if (match.category === "pilates") {
+      sectionsHtml +=
+        section("普拉提地墊／拉根", pilates, "暫時未收錄普拉提動作。") +
+        section("相關核心／臀腿（其他類）", relatedOther, "可再睇核心部位建議。");
+    } else {
+      sectionsHtml +=
+        section("健身房儀器", gym, "呢個目標暫時未收錄對應健身房儀器，可睇其他建議。") +
+        section("有氧器械", cardio, "呢個目標暫時未收錄有氧器械。") +
+        section("普拉提／拉根", pilates, "呢個目標暫時未收錄普拉提動作。") +
+        section("家用／徒手／啞鈴", home, "呢個目標暫時未收錄家用動作，可睇其他建議。");
+    }
+    box.innerHTML = sectionsHtml;
 
     // also mirror to the other results box if present
     const other = targetId === "#goalResultsMoves" ? $("#goalResults") : $("#goalResultsMoves");
@@ -777,7 +825,7 @@
     stage.innerHTML = `
       <div class="bodymap-turntable" id="bodymapTurntable" role="img" aria-label="可拖曳旋轉嘅解剖全身圖 · 而家：${escapeAttr(degLabel)}">
         <div class="bodymap-frame-wrap">
-          <img class="bodymap-frame-img" src="${escapeAttr(frame.src)}?v=20261029e" alt="解剖全身圖 · ${escapeAttr(degLabel)}" draggable="false" width="864" height="1152" />
+          <img class="bodymap-frame-img" src="${escapeAttr(frame.src)}?v=20261029f" alt="解剖全身圖 · ${escapeAttr(degLabel)}" draggable="false" width="864" height="1152" />
           ${overlay ? `<div class="bodymap-overlay-layer${hotspotSide ? "" : " is-dim"}">${overlay}</div>` : `<div class="bodymap-overlay-layer is-dim" aria-hidden="true"></div>`}
         </div>
         <p class="bodymap-drag-hint" aria-hidden="true">↔ 左右拖曳旋轉 · 撳橙色區睇介紹</p>
@@ -866,7 +914,7 @@
     const angle = document.querySelector(".bodymap-angle-label");
     const tt = document.querySelector("#bodymapTurntable");
     if (img) {
-      const src = frame.src + "?v=20261029e";
+      const src = frame.src + "?v=20261029f";
       const file = frame.src.split("/").pop();
       if (!img.getAttribute("src") || !img.getAttribute("src").includes(file)) {
         img.src = src;
@@ -1144,14 +1192,16 @@
     const countEl = $("#catalogCount");
     if (countEl) {
       const modeLabel = state.catalogMode === "challenge" ? "21 日挑戰" : "全部圖解";
-      const catLabelText =
+            const catLabelText =
         state.catalogCategory === "gym"
           ? " · 健身房"
           : state.catalogCategory === "cardio"
             ? " · 有氧"
             : state.catalogCategory === "home"
               ? " · 家用"
-              : "";
+              : state.catalogCategory === "pilates"
+                ? " · 普拉提"
+                : "";
       countEl.textContent = modeLabel + catLabelText + " · " + entries.length + " 款";
     }
     if (!entries.length) {
@@ -1524,6 +1574,7 @@
         `<option value="">全部類別</option>` +
         `<option value="gym">健身房器械</option>` +
         `<option value="cardio">有氧器械</option>` +
+        `<option value="pilates">普拉提／拉根</option>` +
         `<option value="home">家用／徒手／啞鈴</option>`;
       cat.addEventListener("change", () => {
         state.categoryFilter = cat.value;
@@ -1681,7 +1732,8 @@
     const goalChip = ev.target.closest("[data-goal-chip]");
     if (goalChip) {
       const id = goalChip.dataset.goalChip;
-      const label = id === "full" ? "全身" : ((data.muscles.find((x) => x.id === id) || {}).name || id);
+      const label =
+        id === "full" ? "全身" : id === "pilates" ? "普拉提" : ((data.muscles.find((x) => x.id === id) || {}).name || id);
       state.goalQuery = label;
       const onMoves = state.view === "moves";
       if (!onMoves && state.view !== "muscles") showView("muscles");
@@ -1753,20 +1805,21 @@
     if (!muscleMap || !muscleMap.FRAMES) return;
     muscleMap.FRAMES.forEach((f) => {
       const im = new Image();
-      im.src = f.src + "?v=20261029e";
+      im.src = f.src + "?v=20261029f";
     });
   }
 
   function initStats() {
     const gym = data.exercises.filter((e) => e.category === "gym").length;
     const cardio = data.exercises.filter((e) => e.category === "cardio").length;
+    const pilates = data.exercises.filter((e) => e.category === "pilates").length;
     const home = data.exercises.filter((e) => e.category === "home").length;
     const days = (data.challenge && data.challenge.days && data.challenge.days.length) || 0;
     const el = $("#aboutStats");
     if (el) {
       const vids = Object.keys(BUNDLED_VIDEOS).length;
       const mapN = (muscleMap && muscleMap.regions && muscleMap.regions.length) || 0;
-      el.textContent = `而家收錄：健身房器械 ${gym} 款 · 有氧 ${cardio} 款 · 家用／徒手／啞鈴 ${home} 款 · 部位 ${data.muscles.length} 個 · 肌肉圖分區 ${mapN} · 挑戰 ${days} 日 · 內建解剖短片 ${vids} 款`;
+      el.textContent = `而家收錄：健身房器械 ${gym} 款 · 有氧 ${cardio} 款 · 普拉提／拉根 ${pilates} 款 · 家用／徒手／啞鈴 ${home} 款 · 部位 ${data.muscles.length} 個 · 肌肉圖分區 ${mapN} · 挑戰 ${days} 日 · 內建解剖短片 ${vids} 款`;
     }
   }
 
